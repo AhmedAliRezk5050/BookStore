@@ -9,7 +9,8 @@ namespace BookStoreWeb.Models
         //[Key]
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        // [Required] is not needed because NRT is enabled
+        public string Name { get; set; } = null!;
 
         public int DisplayOrder { get; set; }
 
