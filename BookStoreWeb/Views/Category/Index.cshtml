@@ -1,0 +1,12 @@
+﻿@model IEnumerable<Category>?
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h2>Categories</h2>
+
+@foreach (var category in Model ?? Enumerable.Empty<Category>())
+{
+    <p>Name @category.Name</p>
+}

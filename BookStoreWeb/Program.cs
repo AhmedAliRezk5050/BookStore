@@ -31,8 +31,6 @@ public class Program
             app.UseHsts();
         }
 
-        app.UseHttpsRedirection();
-
         app.UseStaticFiles();
 
         app.UseRouting();
@@ -44,7 +42,7 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
         SeedDb(app);
-
+         
 
         app.Run();
     }
@@ -72,5 +70,5 @@ public class Program
 }
 
 
-
+ 
 
