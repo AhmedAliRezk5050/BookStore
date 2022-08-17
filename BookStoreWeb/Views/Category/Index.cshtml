@@ -4,9 +4,33 @@
     ViewData["Title"] = "Categories";
 }
 
-<h2>Categories</h2>
+<div class="row pt-4 mb-5">
+    <div class="col-6">
+        <h2 class="text-primary">Category List</h2>
+    </div>
+    <div class="col-6 text-end">
+        <a asp-controller="Category" asp-action="Create" class="btn btn-outline-secondary">
+            <i class="bi bi-plus-circle"></i>&nbsp;<span>Create New Category</span>
+        </a>
+    </div>
+</div>
 
-@foreach (var category in Model ?? Enumerable.Empty<Category>())
-{
-    <p>Name @category.Name</p>
-}
+<div class="row">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Category Name</th>
+                <th>Category Order</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model ?? Enumerable.Empty<Category>())
+            {
+                <tr>
+                    <td>@category.Name</td>
+                    <td>@category.DisplayOrder</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
