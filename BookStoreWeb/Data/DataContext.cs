@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BookStoreWeb.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace BookStoreWeb.Models
+namespace BookStoreWeb.Data
 {
     public class DataContext : DbContext
     {
