@@ -38,6 +38,7 @@ namespace BookStoreWeb.Controllers
                 {
                     _context.Add(category);
                     await _context.SaveChangesAsync();
+                    TempData["success"] = "Category created successfully";
                     return RedirectToAction("Index");
                 }
             }
@@ -95,6 +96,7 @@ namespace BookStoreWeb.Controllers
                 try
                 {
                     await _context.SaveChangesAsync();
+                    TempData["success"] = "Category edited successfully";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException ex)
@@ -149,6 +151,7 @@ namespace BookStoreWeb.Controllers
             {
                 _context.Categories.Remove(category!);
                 await _context.SaveChangesAsync();
+                TempData["success"] = "Category deleted successfully";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
