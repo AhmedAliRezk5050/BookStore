@@ -24,8 +24,9 @@
     </tbody>
 </table>
 
-<form asp-action="Delete">
+<form asp-action="Delete" method="post">
     <div class="d-flex gap-2">
+        <input type="hidden" asp-for="Id">
         <button class="btn btn-danger">Delete</button>
         <a asp-action="Index" class="btn btn-outline-primary">Back</a>
     </div>
