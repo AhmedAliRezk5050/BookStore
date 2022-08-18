@@ -4,12 +4,7 @@
     ViewData["Title"] = "Categories";
 }
 
-@if (TempData.ContainsKey("success"))
-{
-    <div class="alert alert-success mt-2 mb-2">
-        @TempData["success"]
-    </div>
-}
+<partial name="_Notification"/>
 
 <div class="row pt-4 mb-5">
     <div class="col-6">

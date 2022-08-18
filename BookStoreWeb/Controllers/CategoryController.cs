@@ -128,9 +128,7 @@ namespace BookStoreWeb.Controllers
 
             if (saveChangesError.GetValueOrDefault())
             {
-                ViewData["ErrorMessage"] =
-                    "Delete failed. Try again, and if the problem persists " +
-                    "see your system administrator.";
+                AddDeletionFailureTempData();
             }
 
             return View(category!);
@@ -144,6 +142,7 @@ namespace BookStoreWeb.Controllers
 
             if (!IsCategoryExist(category))
             {
+                AddDeletionFailureTempData();
                 return RedirectToAction(nameof(Index));
             }
 
@@ -157,11 +156,18 @@ namespace BookStoreWeb.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting the Category.");
+
                 return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
             }
         }
 
-
+        private void AddDeletionFailureTempData()
+        {
+            TempData["error"] =
+                "Delete failed. Try again, and if the problem persists " +
+                "see your system administrator.";
+        }
+        
         private static bool IsValidId(int? id) => id is not null or 0;
 
         private static bool IsCategoryExist(Category? category) => category != null;

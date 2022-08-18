@@ -1,8 +1,8 @@
 ﻿@model Category
 
-@if (ViewData.ContainsKey("ErrorMessage"))
+@if (TempData.ContainsKey("error"))
 {
-    <div class="alert alert-danger">@ViewData["ErrorMessage"]</div>
+    <partial name="_Notification"/>
 } 
 
 <h2>Delete</h2>
