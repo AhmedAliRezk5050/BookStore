@@ -12,10 +12,12 @@ namespace BookStoreWeb.Models
 
         // [Required] is not needed because NRT is enabled
         public string Name { get; set; } = null!;
-
+        
+        // ? and Required   to avoid '' in server side validation
+        [Required]
         [DisplayName("Display Order")]
         [Range(1, 100, ErrorMessage = "Display Order must be between 1 and 100.")]
-        public int DisplayOrder { get; set; }
+        public int? DisplayOrder { get; set; }
 
         public DateTime CreatedDateTime { get; set; }
     }
