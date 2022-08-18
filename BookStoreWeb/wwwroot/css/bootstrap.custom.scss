@@ -2,3 +2,12 @@
 @import "../lib/bootstrap/scss/bootstrap";
 @import "bootswatch";
 
+.field-validation-error {
+  @extend .invalid-feedback;
+  display: block;
+}
+
+.valid {
+  @extend .is-valid;
+}
+

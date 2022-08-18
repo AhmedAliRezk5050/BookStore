@@ -48,6 +48,8 @@ Generated\ Files/
 # styles
 *.css
 
+# map
+*.map
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
