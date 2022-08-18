@@ -1,0 +1,32 @@
+﻿@model Category
+
+@if (ViewData.ContainsKey("ErrorMessage"))
+{
+    <div class="alert alert-danger">@ViewData["ErrorMessage"]</div>
+} 
+
+<h2>Delete</h2>
+
+<p>Are you sure you want to delete this category?</p>
+
+<table class="table table-bordered table-striped mt-3 mb-3">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Display Order</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>@Model.Name</td>
+        <td>@Model.DisplayOrder</td>
+    </tr>
+    </tbody>
+</table>
+
+<form asp-action="Delete">
+    <div class="d-flex gap-2">
+        <button class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-outline-primary">Back</a>
+    </div>
+</form>

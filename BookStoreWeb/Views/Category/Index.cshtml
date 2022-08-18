@@ -31,9 +31,14 @@
                 <td>@category.Name</td>
                 <td>@category.DisplayOrder</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-warning d-inline-flex gap-1">
-                        <i class="bi bi-pencil-square"></i>Edit
-                    </a>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-warning d-inline-flex gap-1">
+                            <i class="bi bi-pencil-square"></i>Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger d-inline-flex gap-1">
+                           <i class="bi bi-trash"></i>Delete
+                        </a>
+                    </div>
                 </td>
             </tr>
         }
