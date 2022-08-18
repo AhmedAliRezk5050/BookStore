@@ -51,5 +51,67 @@ namespace BookStoreWeb.Controllers
 
             return View(category);
         }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id is null or 0)
+            {
+                return NotFound();
+            }
+
+            var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            return View(category);
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPost(int? id)
+        {
+            if (IsValidId(id))
+            {
+                return NotFound();
+            }
+
+            var categoryToUpdate = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (!IsCategoryExist(categoryToUpdate))
+            {
+                return NotFound();
+            }
+
+            if (await TryUpdateModelAsync<Category>(
+                    categoryToUpdate!,
+                    "",
+                    c => c.Name,
+                    c => c.DisplayOrder!
+                ))
+            {
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException  ex)
+                {
+                    _logger.LogError(ex, "An error occurred while updating the Category.");
+                    
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                                                 "Try again, and if the problem persists, " +
+                                                 "see your system administrator.");
+                }
+            }
+            
+            return View(categoryToUpdate);
+        }
+
+        private static bool IsValidId(int? id) => id is null or 0;
+
+        private static bool IsCategoryExist(Category? category) => category != null;
     }
 }
