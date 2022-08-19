@@ -1,0 +1,66 @@
+﻿@page "/pages/categories/edit/{id:int?}"
+@model BookStoreWeb.Pages.Categories.EditModel
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+
+@{
+    ViewData["Title"] = "Edit";
+
+    var nameStatus = ViewData.ModelState.GetFieldValidationState("Category.Name") switch
+    {
+        ModelValidationState.Valid => "is-valid",
+        ModelValidationState.Invalid => "is-invalid",
+        _ => string.Empty
+        };
+
+    var displayOrderStatus = ViewData.ModelState.GetFieldValidationState("Category.DisplayOrder") switch
+    {
+        ModelValidationState.Valid => "is-valid",
+        ModelValidationState.Invalid => "is-invalid",
+        _ => string.Empty
+        };
+
+    var createdDateTimeStatus = ViewData.ModelState.GetFieldValidationState("Category.CreatedDateTime") switch
+    {
+        ModelValidationState.Valid => "is-valid",
+        ModelValidationState.Invalid => "is-invalid",
+        _ => string.Empty
+        };
+}
+
+<form method="post">
+    <div class="" asp-validation-summary="All"></div>
+    <div class="border p-3 mt-4">
+        <div class="mb-2">
+            <h2>Edit Category</h2>
+            <hr/>
+        </div>
+        <input type="hidden" asp-for="Category!.Id">
+        <div class="mb-3">
+            <label asp-for="Category!.Name" class="form-label"></label>
+            <input asp-for="Category!.Name"
+                   class="form-control @nameStatus">
+            <span class="" asp-validation-for="Category!.Name"></span>
+        </div>
+        <div class="mb-4">
+            <label asp-for="Category!.DisplayOrder" class="form-label"></label>
+            <input asp-for="Category!.DisplayOrder" class="form-control @displayOrderStatus">
+            <span class="" asp-validation-for="Category!.DisplayOrder"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Category!.CreatedDateTime" class="form-label"></label>
+            <input asp-for="Category!.CreatedDateTime" class="form-control @createdDateTimeStatus">
+            <span class="" asp-validation-for="Category!.CreatedDateTime"></span>
+        </div>
+        <button class="btn btn-warning me-3">Edit</button>
+        <a asp-page="./Index" class="btn btn-outline-primary">Back</a>
+    </div>
+</form>
+
+
+@section Scripts
+{
+    @{
+        <partial name="_ValidationScriptsPartial"/>
+    }
+}

@@ -1,18 +1,28 @@
-﻿@page
+﻿@page "/pages/categories/create"
 @model BookStoreWeb.Pages.Categories.CreateModel
 @using Microsoft.AspNetCore.Mvc.ModelBinding
 
 @{
     ViewData["Title"] = "Create";
 
-    var nameStatus = ViewData.ModelState.GetFieldValidationState("Name") switch
+    var nameStatus = ViewData.ModelState
+        .GetFieldValidationState("Category.Name") switch
     {
         ModelValidationState.Valid => "is-valid",
         ModelValidationState.Invalid => "is-invalid",
         _ => string.Empty
         };
 
-    var displayOrderStatus = ViewData.ModelState.GetFieldValidationState("DisplayOrder") switch
+    var displayOrderStatus = ViewData.ModelState
+        .GetFieldValidationState("Category.DisplayOrder") switch
+    {
+        ModelValidationState.Valid => "is-valid",
+        ModelValidationState.Invalid => "is-invalid",
+        _ => string.Empty
+        };
+    
+    var createdDateTimeStatus = ViewData.ModelState
+        .GetFieldValidationState("Category.CreatedDateTime") switch
     {
         ModelValidationState.Valid => "is-valid",
         ModelValidationState.Invalid => "is-invalid",
@@ -42,7 +52,7 @@
 
         <div class="mb-4">
             <label asp-for="Category.CreatedDateTime" class="form-label"></label>
-            <input asp-for="Category.CreatedDateTime" class="form-control @displayOrderStatus">
+            <input asp-for="Category.CreatedDateTime" class="form-control @createdDateTimeStatus">
             <span class="" asp-validation-for="Category.CreatedDateTime"></span>
         </div>
 

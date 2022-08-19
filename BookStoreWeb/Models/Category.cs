@@ -19,7 +19,8 @@ namespace BookStoreWeb.Models
         [Range(1, 100, ErrorMessage = "Display Order must be between 1 and 100.")]
         public int? DisplayOrder { get; set; }
 
+        [Required]
         [DisplayName("Creation Date")]
-        public DateTime CreatedDateTime { get; set; }
+        public DateTime? CreatedDateTime { get; set; }
     }
 }
