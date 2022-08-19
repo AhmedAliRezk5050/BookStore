@@ -36,7 +36,7 @@
                         <a asp-page="./Edit" asp-route-id="@category.Id" class="btn btn-warning d-inline-flex gap-1">
                             <i class="bi bi-pencil-square"></i>Edit
                         </a>
-                        <a class="btn btn-danger d-inline-flex gap-1">
+                        <a asp-page="Delete" asp-route-id="@category.Id" class="btn btn-danger d-inline-flex gap-1">
                             <i class="bi bi-trash"></i>Delete
                         </a>
                         <a asp-page="/categories/details" asp-route-id="@category.Id" 
