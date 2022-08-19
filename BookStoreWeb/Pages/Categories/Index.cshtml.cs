@@ -19,7 +19,7 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         Categories = await _context.Categories.ToListAsync();
-
+        
         return Page();
     }
 }

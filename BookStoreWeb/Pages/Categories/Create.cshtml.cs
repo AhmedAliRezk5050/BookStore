@@ -42,7 +42,9 @@ public class CreateModel : PageModel
             _context.Categories.Add(emptyCategory);
 
             await _context.SaveChangesAsync();
-
+            
+            TempData["success"] = "Category created successfully";
+            
             return RedirectToPage("./Index");
         }
 

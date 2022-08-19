@@ -53,6 +53,8 @@ public class EditModel : PageModel
         {
             await _context.SaveChangesAsync();
 
+            TempData["success"] = "Category edited successfully";
+                
             return RedirectToPage("./Index");
         }
 

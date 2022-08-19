@@ -10,9 +10,12 @@ public class DeleteModel : PageModel
     private readonly DataContext _context;
     public Category? Category { get; set; }
 
-    public DeleteModel(DataContext context)
+    private readonly ILogger<DeleteModel> _logger;
+    
+    public DeleteModel(DataContext context, ILogger<DeleteModel> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<IActionResult> OnGet(int? id, bool? saveChangesError = false)
@@ -55,10 +58,15 @@ public class DeleteModel : PageModel
         {
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
+            
+            TempData["success"] = "Category deleted successfully";
+            
             return RedirectToPage("Index");
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "An error occurred while deleting the Category.");
+            
             return RedirectToPage("Index", new { id = category.Id, saveChangesError = true });
         }
     }
