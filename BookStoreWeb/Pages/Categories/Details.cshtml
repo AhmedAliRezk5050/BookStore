@@ -1,0 +1,27 @@
+﻿@page "/pages/categories/{id:int?}"
+@model BookStoreWeb.Pages.Categories.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<table class="table table-bordered table-striped mb-2 mt-2">
+    <thead>
+    <tr>
+        <th>@Html.DisplayNameFor(m => m.Category!.Name)</th>
+        <th>@Html.DisplayNameFor(m => m.Category!.DisplayOrder)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>@Html.DisplayFor(m => m.Category!.Name)</td>
+        <td>@Html.DisplayFor(m => m.Category!.DisplayOrder)</td>
+    </tr>
+    </tbody>
+</table>
+
+<div>
+    <a asp-page="./Index" class="btn btn-primary">Back</a>
+</div>
