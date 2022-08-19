@@ -34,7 +34,8 @@ public class CreateModel : PageModel
                 emptyCategory,
                 "category",
                 c => c.Name,
-                c => c.DisplayOrder!
+                c => c.DisplayOrder!,
+                c => c.CreatedDateTime
             )
            )
         {

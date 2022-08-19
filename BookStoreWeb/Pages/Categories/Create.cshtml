@@ -39,6 +39,13 @@
             <span class="" asp-validation-for="Category.DisplayOrder"></span>
         </div>
 
+
+        <div class="mb-4">
+            <label asp-for="Category.CreatedDateTime" class="form-label"></label>
+            <input asp-for="Category.CreatedDateTime" class="form-control @displayOrderStatus">
+            <span class="" asp-validation-for="Category.CreatedDateTime"></span>
+        </div>
+
         <button class="btn btn-primary me-3">Create</button>
         <a asp-action="Index" class="btn btn-outline-primary">Back</a>
     </div>
