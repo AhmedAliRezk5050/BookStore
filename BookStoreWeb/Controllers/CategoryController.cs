@@ -1,4 +1,5 @@
 ﻿using BookStore.DataAccess;
+using BookStore.DataAccess.Repository.IRepository;
 using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,18 +8,20 @@ namespace BookStoreWeb.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        
         private readonly ILogger<CategoryController> _logger;
 
-        public CategoryController(DataContext context, ILogger<CategoryController> logger)
+        public CategoryController(IUnitOfWork unitOfWork, ILogger<CategoryController> logger)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
+            
             _logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
-            var categories = await _context.Categories.AsNoTracking().ToListAsync();
+            var categories = await _unitOfWork.CategoryRepository.GetAllAsync();
 
             return View(categories);
         }
@@ -36,8 +39,8 @@ namespace BookStoreWeb.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _context.Add(category);
-                    await _context.SaveChangesAsync();
+                    _unitOfWork.CategoryRepository.Add(category);
+                    await _unitOfWork.SaveAsync();
                     TempData["success"] = "Category created successfully";
                     return RedirectToAction("Index");
                 }
@@ -60,7 +63,7 @@ namespace BookStoreWeb.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _unitOfWork.CategoryRepository.GetFirstOrDefaultAsync(c => c.Id == id);
 
             if (category == null)
             {
@@ -72,30 +75,19 @@ namespace BookStoreWeb.Controllers
 
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(int? id)
+        public async Task<IActionResult> EditPost(int id, [Bind("Name", "DisplayOrder, CreatedDateTime")] Category category)
         {
-            if (!IsValidId(id))
+            if (!IsValidId(id) || !await IsCategoryExist(id))
             {
                 return NotFound();
             }
 
-            var categoryToUpdate = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-
-            if (!IsCategoryExist(categoryToUpdate))
-            {
-                return NotFound();
-            }
-
-            if (await TryUpdateModelAsync<Category>(
-                    categoryToUpdate!,
-                    "",
-                    c => c.Name,
-                    c => c.DisplayOrder!
-                ))
+            if (ModelState.IsValid)
             {
                 try
                 {
-                    await _context.SaveChangesAsync();
+                    _unitOfWork.CategoryRepository.Update(category);
+                    await _unitOfWork.SaveAsync();
                     TempData["success"] = "Category edited successfully";
                     return RedirectToAction(nameof(Index));
                 }
@@ -109,7 +101,7 @@ namespace BookStoreWeb.Controllers
                 }
             }
 
-            return View(categoryToUpdate);
+            return View(category);
         }
 
         public async Task<IActionResult> Delete(int? id, bool? saveChangesError)
@@ -119,9 +111,9 @@ namespace BookStoreWeb.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _unitOfWork.CategoryRepository.GetFirstOrDefaultAsync(c => c.Id == id);
 
-            if (!IsCategoryExist(category))
+            if (category == null)
             {
                 return NotFound();
             }
@@ -138,9 +130,9 @@ namespace BookStoreWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _unitOfWork.CategoryRepository.GetFirstOrDefaultAsync(c => c.Id == id);
 
-            if (!IsCategoryExist(category))
+            if (category == null)
             {
                 AddDeletionFailureTempData();
                 return RedirectToAction(nameof(Index));
@@ -148,8 +140,8 @@ namespace BookStoreWeb.Controllers
 
             try
             {
-                _context.Categories.Remove(category!);
-                await _context.SaveChangesAsync();
+                _unitOfWork.CategoryRepository.Remove(category!);
+                await _unitOfWork.SaveAsync();
                 TempData["success"] = "Category deleted successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -170,6 +162,10 @@ namespace BookStoreWeb.Controllers
         
         private static bool IsValidId(int? id) => id is not null or 0;
 
-        private static bool IsCategoryExist(Category? category) => category != null;
+        private async Task<bool> IsCategoryExist(int? id)
+        {
+            var category = await _unitOfWork.CategoryRepository.GetFirstOrDefaultAsync(c => c.Id == id);
+            return category != null;
+        }
     }
 }

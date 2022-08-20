@@ -1,4 +1,6 @@
 using BookStore.DataAccess;
+using BookStore.DataAccess.Repository;
+using BookStore.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreWeb;
@@ -16,6 +18,8 @@ public class Program
             }
         );
 
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
         builder.Services.AddControllersWithViews();
 
         builder.Services.AddRazorPages();

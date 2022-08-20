@@ -17,6 +17,13 @@
         ModelValidationState.Invalid => "is-invalid",
         _ => string.Empty
         };
+
+    var createdDateTimeStatus = ViewData.ModelState.GetFieldValidationState("CreatedDateTime") switch
+    {
+        ModelValidationState.Valid => "is-valid",
+        ModelValidationState.Invalid => "is-invalid",
+        _ => string.Empty
+        };
 }
 
 <form asp-action="Edit">
@@ -39,8 +46,14 @@
             <span class="" asp-validation-for="DisplayOrder"></span>
         </div>
 
+        <div class="mb-4">
+            <label asp-for="CreatedDateTime" class="form-label"></label>
+            <input asp-for="CreatedDateTime" class="form-control @createdDateTimeStatus">
+            <span class="" asp-validation-for="CreatedDateTime"></span>
+        </div>
+
         <button class="btn btn-warning me-3">Edit</button>
-            <a asp-action="Index" class="btn btn-outline-primary">Back</a>
+        <a asp-action="Index" class="btn btn-outline-primary">Back</a>
     </div>
 </form>
 
