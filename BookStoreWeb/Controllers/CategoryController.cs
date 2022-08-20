@@ -1,5 +1,5 @@
-﻿using BookStoreWeb.Data;
-using BookStoreWeb.Models;
+﻿using BookStore.DataAccess;
+using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +30,7 @@ namespace BookStoreWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name", "DisplayOrder")] Category category)
+        public async Task<IActionResult> Create([Bind("Name", "DisplayOrder, CreatedDateTime")] Category category)
         {
             try
             {

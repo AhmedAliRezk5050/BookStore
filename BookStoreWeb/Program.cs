@@ -1,6 +1,5 @@
-using BookStoreWeb.Data;
+using BookStore.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 namespace BookStoreWeb;
 

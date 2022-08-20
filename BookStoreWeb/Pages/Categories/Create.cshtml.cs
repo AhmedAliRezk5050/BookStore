@@ -1,5 +1,5 @@
-﻿using BookStoreWeb.Data;
-using BookStoreWeb.Models;
+﻿using BookStore.DataAccess;
+using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -35,7 +35,7 @@ public class CreateModel : PageModel
                 "category",
                 c => c.Name,
                 c => c.DisplayOrder!,
-                c => c.CreatedDateTime
+                c => c.CreatedDateTime!
             )
            )
         {

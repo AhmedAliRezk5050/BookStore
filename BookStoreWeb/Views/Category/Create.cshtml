@@ -1,9 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model Category
 
 @{
     ViewData["Title"] = "Create";
-    // var nameStatus = ViewData.ModelState.GetFieldValidationState("Name") == ModelValidationState.Invalid ? "is-invalid" : "";
 
     var nameStatus = ViewData.ModelState.GetFieldValidationState("Name") switch
     {
@@ -13,6 +13,13 @@
         };
     
     var displayOrderStatus = ViewData.ModelState.GetFieldValidationState("DisplayOrder") switch
+    {
+        ModelValidationState.Valid => "is-valid",
+        ModelValidationState.Invalid => "is-invalid",
+        _ => string.Empty
+        };  
+    
+    var createdDateTimeStatus = ViewData.ModelState.GetFieldValidationState("CreatedDateTime") switch
     {
         ModelValidationState.Valid => "is-valid",
         ModelValidationState.Invalid => "is-invalid",
@@ -37,6 +44,11 @@
             <input asp-for="DisplayOrder" class="form-control @displayOrderStatus">
             <span class="" asp-validation-for="DisplayOrder"></span>
         </div>
+        <div class="mb-4">
+                    <label asp-for="CreatedDateTime" class="form-label"></label>
+                    <input asp-for="CreatedDateTime" class="form-control @createdDateTimeStatus">
+                    <span class="" asp-validation-for="DisplayOrder"></span>
+                </div>
 
         <button class="btn btn-primary me-3">Create</button>
         <a asp-action="Index" class="btn btn-outline-primary">Back</a>

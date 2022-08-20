@@ -1,9 +1,8 @@
-﻿using System;
+﻿#nullable disable
+
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
-namespace BookStoreWeb.Migrations
+namespace BookStore.DataAccess.Migrations
 {
     public partial class addCategoryTable : Migration
     {
