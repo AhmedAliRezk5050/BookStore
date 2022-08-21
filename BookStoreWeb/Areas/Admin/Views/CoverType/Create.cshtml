@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model CoverType
+
+@{
+    ViewData["Title"] = "Create Cover Type";
+
+    var nameStatus = ViewData.ModelState.GetFieldValidationState("Name") switch
+    {
+        ModelValidationState.Valid => "is-valid",
+        ModelValidationState.Invalid => "is-invalid",
+        _ => string.Empty
+    };
+}
+
+<form asp-action="Create">
+    <div class="" asp-validation-summary="ModelOnly"></div>
+    <div class="border p-3 mt-4">
+        <div class="mb-2">
+            <h2>Create Cover Type</h2>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name"
+                   class="form-control @nameStatus">
+            <span class="" asp-validation-for="Name"></span>
+        </div>
+        <button class="btn btn-primary me-3">Create</button>
+        <a asp-action="Index" class="btn btn-outline-primary">Back</a>
+    </div>
+</form>
+
+
+@section Scripts
+    {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    }

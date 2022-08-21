@@ -74,9 +74,9 @@ namespace BookStoreWeb.Areas.Admin.Controllers
             return View(category);
         }
 
-        [HttpPost, ActionName("Edit")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(int id, [Bind("Id", "Name", "DisplayOrder, CreatedDateTime")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id", "Name", "DisplayOrder, CreatedDateTime")] Category category)
         {
             if (id != category.Id)
             {
@@ -133,10 +133,16 @@ namespace BookStoreWeb.Areas.Admin.Controllers
             return View(category!);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
+
+            if(id is null or 0)
+            {
+                return NotFound();
+            }
+
             var category = await _unitOfWork.CategoryRepository.GetFirstOrDefaultAsync(c => c.Id == id);
 
             if (category == null)

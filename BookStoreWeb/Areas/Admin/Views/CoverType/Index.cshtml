@@ -1,0 +1,50 @@
+﻿@model IEnumerable<CoverType>?
+
+@{
+    ViewData["Title"] = "Cover Types";
+}
+
+<div class="row pt-4 mb-5">
+    <div class="col-6">
+        <h2 class="text-primary">Cover Types List</h2>
+    </div>
+    <div class="col-6 text-end">
+        <a asp-controller="CoverType" asp-action="Create" class="btn btn-outline-secondary">
+            <i class="bi bi-plus-circle"></i>&nbsp;<span>Create New Cover Type</span>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    @if (Model != null && !Model.Any())
+    {
+        <div class="text-danger mt-2 mb-2">No Cover Type is found. Create new Cover Type</div>
+    }
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Cover Type Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+           
+            @foreach (var coverType in Model ?? Enumerable.Empty<CoverType>())
+            {
+                <tr>
+                    <td>@coverType.Name</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a asp-action="Edit" asp-route-id="@coverType.Id" class="btn btn-warning d-inline-flex gap-1">
+                                <i class="bi bi-pencil-square"></i>Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@coverType.Id" class="btn btn-danger d-inline-flex gap-1">
+                                <i class="bi bi-trash"></i>Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
