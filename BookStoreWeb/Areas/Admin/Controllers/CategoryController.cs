@@ -4,18 +4,19 @@ using BookStore.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BookStoreWeb.Controllers
+namespace BookStoreWeb.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        
+
         private readonly ILogger<CategoryController> _logger;
 
         public CategoryController(IUnitOfWork unitOfWork, ILogger<CategoryController> logger)
         {
             _unitOfWork = unitOfWork;
-            
+
             _logger = logger;
         }
 
@@ -94,7 +95,7 @@ namespace BookStoreWeb.Controllers
                 catch (Exception ex)
                 {
 
-                    if(!await IsCategoryExist(id))
+                    if (!await IsCategoryExist(id))
                     {
                         return NotFound();
                     }
@@ -155,7 +156,7 @@ namespace BookStoreWeb.Controllers
             {
                 _logger.LogError(ex, "An error occurred while deleting the Category.");
 
-                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+                return RedirectToAction(nameof(Delete), new { id, saveChangesError = true });
             }
         }
 
@@ -165,7 +166,7 @@ namespace BookStoreWeb.Controllers
                 "Delete failed. Try again, and if the problem persists " +
                 "see your system administrator.";
         }
-        
+
         private static bool IsValidId(int? id) => id is not null or 0;
 
         private async Task<bool> IsCategoryExist(int? id)
