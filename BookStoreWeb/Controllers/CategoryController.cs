@@ -75,9 +75,9 @@ namespace BookStoreWeb.Controllers
 
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(int id, [Bind("Name", "DisplayOrder, CreatedDateTime")] Category category)
+        public async Task<IActionResult> EditPost(int id, [Bind("Id", "Name", "DisplayOrder, CreatedDateTime")] Category category)
         {
-            if (!IsValidId(id) || !await IsCategoryExist(id))
+            if (id != category.Id)
             {
                 return NotFound();
             }
@@ -91,8 +91,14 @@ namespace BookStoreWeb.Controllers
                     TempData["success"] = "Category edited successfully";
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateException ex)
+                catch (Exception ex)
                 {
+
+                    if(!await IsCategoryExist(id))
+                    {
+                        return NotFound();
+                    }
+
                     _logger.LogError(ex, "An error occurred while updating the Category.");
 
                     ModelState.AddModelError("", "Unable to save changes. " +

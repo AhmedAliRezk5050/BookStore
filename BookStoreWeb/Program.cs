@@ -22,8 +22,6 @@ public class Program
         
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddRazorPages();
-
         if (builder.Environment.IsDevelopment())
         {
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -50,8 +48,6 @@ public class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
-
-        app.MapRazorPages();
 
         SeedDb(app);
 
