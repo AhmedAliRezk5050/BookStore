@@ -1,37 +1,24 @@
 ﻿using BookStore.DataAccess.Repository.IRepository;
+using BookStore.Models;
 
 namespace BookStore.DataAccess.Repository;
 
-public class UnitOfWork : IUnitOfWork
+public class CoverTypeRepository : Repository<CoverType>, ICoverTyeRepository
 {
     private readonly DataContext _context;
 
     private bool _disposed = false;
 
-    public ICategoryRepository CategoryRepository { get; private set; }
-    
-    public ICoverTyeRepository CoverTyeRepository { get; private set;}
-
-    public UnitOfWork(DataContext context)
+    public CoverTypeRepository(DataContext context) : base(context)
     {
         _context = context;
-
-        CategoryRepository = new CategoryRepository(_context);
-        
-        CoverTyeRepository = new CoverTypeRepository(_context);
-    }
-    
-    
-    public void Save()
-    {
-        _context.SaveChanges();
     }
 
-    public Task SaveAsync()
+    public void Update(CoverType coverType)
     {
-        return _context.SaveChangesAsync();
+        dbSet.Update(coverType);
     }
-    
+
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)
@@ -41,6 +28,7 @@ public class UnitOfWork : IUnitOfWork
                 _context.Dispose();
             }
         }
+
         _disposed = true;
     }
 
