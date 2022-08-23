@@ -44,7 +44,7 @@ namespace BookStore.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.Models.CoverType", b =>
@@ -62,7 +62,7 @@ namespace BookStore.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CoverTypes");
+                    b.ToTable("CoverTypes", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.Models.Product", b =>
@@ -117,7 +117,7 @@ namespace BookStore.DataAccess.Migrations
 
                     b.HasIndex("CoverTypeId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("BookStore.Models.Product", b =>

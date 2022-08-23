@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -27,33 +29,37 @@ namespace BookStore.Models
 
         [Required]
         [Range(1, 10000)]
-        public double ListPrice { get; set; }
+        public double? ListPrice { get; set; }
 
         [Required]
         [Range(1, 10000)]
-        public double Price { get; set; }
+        public double? Price { get; set; }
 
         [Required]
         [Range(1, 10000)]
-        public double Price50 { get; set; }
+        public double? Price50 { get; set; }
 
         [Required]
         [Range(1, 10000)]
-        public double Price100 { get; set; }
+        public double? Price100 { get; set; }
+
+        [DisplayName("Image Url")]
+        public string? ImageUrl { get; set; }
 
         [Required]
-        public string ImageUrl { get; set; } = null!;
-
-        [Required]
-        public int CategoryId { get; set; }
+        [DisplayName("Category")]
+        public int? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
+        [ValidateNever]
         public Category Category { get; set; } = null!;
 
         [Required]
-        public int CoverTypeId { get; set; }
+        [DisplayName("Cover Type")]
+        public int? CoverTypeId { get; set; }
 
         [ForeignKey("CoverTypeId")]
+        [ValidateNever]
         public CoverType CoverType { get; set; } = null!;
     }
 }

@@ -6,6 +6,8 @@ public interface IUnitOfWork : IDisposable
     
     ICoverTyeRepository CoverTyeRepository { get; }
 
+    IProductRepository ProductRepository { get; }
+
     void Save();
     
     Task SaveAsync();
