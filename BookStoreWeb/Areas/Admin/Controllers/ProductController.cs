@@ -18,15 +18,15 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(IUnitOfWork unitOfWork, ILogger<ProductController> logger, IWebHostEnvironment webHostEnvironment)
+        public ProductController(IUnitOfWork unitOfWork, ILogger<ProductController> logger,
+            IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
-
         }
 
-        public  IActionResult Index()
+        public IActionResult Index()
         {
             return View();
         }
@@ -36,15 +36,14 @@ namespace BookStoreWeb.Areas.Admin.Controllers
         {
             ProductViewModel productViewModel = new();
             productViewModel.CategoriesSelectList = (await _unitOfWork.CategoryRepository
-                        .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+                .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
 
             productViewModel.CoverTypesSelectList = (await _unitOfWork.CoverTyeRepository
-                    .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+                .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
 
             if (id is null or 0)
             {
                 return View(productViewModel);
-
             }
             else
             {
@@ -67,8 +66,9 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                         if (formFile is not null)
                         {
                             string? uniqueFileName = UploadedFile(formFile);
-                            productViewModel.Product.ImageUrl = uniqueFileName; 
+                            productViewModel.Product.ImageUrl = uniqueFileName;
                         }
+
                         _unitOfWork.ProductRepository.Add(productViewModel.Product!);
                         await _unitOfWork.SaveAsync();
                         TempData["success"] = "Product created successfully";
@@ -94,8 +94,9 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                         if (formFile is not null)
                         {
                             string? uniqueFileName = UploadedFile(formFile);
-                            productViewModel.Product!.ImageUrl = uniqueFileName; 
+                            productViewModel.Product!.ImageUrl = uniqueFileName;
                         }
+
                         await _unitOfWork.ProductRepository.Update(productViewModel.Product!);
                         await _unitOfWork.SaveAsync();
                         TempData["success"] = "Product updated successfully";
@@ -112,13 +113,25 @@ namespace BookStoreWeb.Areas.Admin.Controllers
             }
 
             productViewModel.CategoriesSelectList = (await _unitOfWork.CategoryRepository
-                        .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+                .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
 
             productViewModel.CoverTypesSelectList = (await _unitOfWork.CoverTyeRepository
-                    .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+                .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
 
             return View(productViewModel);
         }
+
+        #region API CALLS
+
+        public async Task<IActionResult> GetAll()
+        {
+            var products = await _unitOfWork.ProductRepository.GetAllAsync();
+            return Json(new {data = products});
+        }
+
+        #endregion
+        
+
 
         private void AddDeletionFailureTempData()
         {
@@ -126,7 +139,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                 "Delete failed. Try again, and if the problem persists " +
                 "see your system administrator.";
         }
-        
+
         private string UploadedFile(IFormFile formFile)
         {
             string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
@@ -136,6 +149,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
             {
                 formFile.CopyTo(fileStream);
             }
+
             return uniqueFileName;
         }
     }
