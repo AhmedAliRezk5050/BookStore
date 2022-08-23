@@ -122,7 +122,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
         }
 
         #region API CALLS
-
+ 
         public async Task<IActionResult> GetAll()
         {
             var products = await _unitOfWork.ProductRepository.GetAllAsync("Category,CoverType");
