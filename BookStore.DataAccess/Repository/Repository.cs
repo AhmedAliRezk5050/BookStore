@@ -14,7 +14,7 @@ namespace BookStore.DataAccess.Repository
         private readonly DataContext _context;
 
         internal DbSet<T> dbSet;
-        
+
         public Repository(DataContext context)
         {
             _context = context;
@@ -28,7 +28,6 @@ namespace BookStore.DataAccess.Repository
             dbSet.Add(entity);
         }
 
-
         public IEnumerable<T> GetAll()
         {
             IQueryable<T> query = dbSet;
@@ -36,9 +35,16 @@ namespace BookStore.DataAccess.Repository
             return query.ToList();
         }
 
-        public Task<List<T>> GetAllAsync()
+        public Task<List<T>> GetAllAsync(string includedProperties = "")
         {
             IQueryable<T> query = dbSet;
+
+            foreach (var c in includedProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(c);
+                Console.WriteLine(c);
+            }
+
             return query.ToListAsync();
         }
 
@@ -49,9 +55,14 @@ namespace BookStore.DataAccess.Repository
             return query.FirstOrDefault();
         }
 
-        public Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter)
+        public Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includedProperties = "")
         {
             IQueryable<T> query = dbSet.Where(filter);
+
+            foreach (var c in includedProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(c);
+            }
 
             return query.FirstOrDefaultAsync();
         }

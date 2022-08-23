@@ -10,10 +10,10 @@ namespace BookStore.DataAccess.Repository.IRepository
     public interface IRepository<T> where T : class
     {
         T? GetFirstOrDefault(Expression<Func<T, bool>> filter);
-        Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter);
+        Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includedProperties = "");
 
         IEnumerable<T> GetAll();
-        Task<List<T>> GetAllAsync();
+        Task<List<T>> GetAllAsync(string includedProperties = "");
 
         void Add(T entity);
 
