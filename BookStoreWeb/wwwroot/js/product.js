@@ -24,7 +24,7 @@ function loadDataTable() {
                                         <a href="/Admin/Product/Upsert/${data}" class="btn btn-warning d-inline-flex gap-1">
                                             <i class="bi bi-pencil-square"></i>Edit
                                         </a>
-                                        <a  href="/Admin/Product/delete/${data}" class="btn btn-danger d-inline-flex gap-1">
+                                        <a  onclick="deleteProduct('/admin/product/delete/${data}')" class="btn btn-danger d-inline-flex gap-1">
                                            <i class="bi bi-trash"></i>Delete
                                         </a> 
                                  </div>  
@@ -36,3 +36,31 @@ function loadDataTable() {
         }
     );
 }
+
+function deleteProduct(url) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url,
+                type: "DELETE",
+                success: function(data) {
+                    if(data.success) {
+                        toastr.success(data.message);
+                        dataTable.ajax.reload();
+                    } else {
+                        toastr.error(data.message);
+                    }
+                }
+            })
+        }
+    })
+}
+

@@ -66,7 +66,8 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                         if (formFile is not null)
                         {
                             string? uniqueFileName = UploadedFile(formFile);
-                            productViewModel.Product.ImageUrl = uniqueFileName;
+
+                            productViewModel.Product!.ImageUrl = uniqueFileName;
                         }
 
                         _unitOfWork.ProductRepository.Add(productViewModel.Product!);
@@ -93,6 +94,12 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     {
                         if (formFile is not null)
                         {
+                            string? productOldImgUrl = (await _unitOfWork.ProductRepository
+                                .GetFirstOrDefaultAsync(p => p.Id == productViewModel.Product!.Id))!.ImageUrl;
+
+                            string? toDeleteOldProductImg = Path.Combine(_webHostEnvironment.WebRootPath, "images",
+                                "products", productOldImgUrl!);
+                            System.IO.File.Delete(toDeleteOldProductImg);
                             string? uniqueFileName = UploadedFile(formFile);
                             productViewModel.Product!.ImageUrl = uniqueFileName;
                         }
@@ -122,15 +129,40 @@ namespace BookStoreWeb.Areas.Admin.Controllers
         }
 
         #region API CALLS
- 
+
         public async Task<IActionResult> GetAll()
         {
             var products = await _unitOfWork.ProductRepository.GetAllAsync("Category,CoverType");
             return Json(new { data = products });
         }
 
-        #endregion
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            var product = await _unitOfWork.ProductRepository.GetFirstOrDefaultAsync(c => c.Id == id);
 
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+
+            try
+            {
+                _unitOfWork.ProductRepository.Remove(product);
+                await _unitOfWork.SaveAsync();
+                string toDeleteImgPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "products",
+                    product.ImageUrl!);
+                System.IO.File.Delete(toDeleteImgPath);
+                return Json(new { success = true, message = "Product deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the Category.");
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+        }
+
+        #endregion 
 
         private void AddDeletionFailureTempData()
         {
@@ -141,7 +173,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
         private string UploadedFile(IFormFile formFile)
         {
-            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "products");
             var uniqueFileName = Guid.NewGuid().ToString() + "_" + formFile.FileName;
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
             using (var fileStream = new FileStream(filePath, FileMode.Create))

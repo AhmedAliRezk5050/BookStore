@@ -20,5 +20,7 @@ namespace BookStore.Models.ViewModels
 
         [ValidateNever]
         public IEnumerable<SelectListItem>? CoverTypesSelectList { get; set; }
+
+        public string? ImagesFolderPath { get; set; }
     }
 }

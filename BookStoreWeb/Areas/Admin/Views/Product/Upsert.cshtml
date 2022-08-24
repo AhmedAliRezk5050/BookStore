@@ -1,18 +1,34 @@
 ﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
 @model ProductViewModel;
 
-
 <form asp-action="Upsert" enctype="multipart/form-data">
     <div class="" asp-validation-summary="All"></div>
     <div class="border p-3 mt-4">
         <div class="mb-2">
-            <h2>@(Model.Product != null ? "Edit" : "Create") Product</h2>
+            
+               @if (Model.Product == null  || Model.Product?.Id == 0)
+                    {
+                        <h2>Create Product</h2>
+                    }
+                    @if(Model.Product != null && Model.Product.Id != 0)
+                    {
+                        <h2>Edit Product</h2>
+                    }
             <hr/>
         </div>
         @if (Model.Product != null)
         {
             <input asp-for="Product!.Id" hidden>
         }
+
+        @if (Model.Product != null && Model.Product.Id != 0)
+        {
+            <div class="mt-2 mb-4">
+                <img src="/images/products/@Model.Product?.ImageUrl" alt="" class="img-thumbnail"
+                     style="height: 200px; width: 200px; object-fit: cover;">
+            </div>
+        }
+
         <div class="mb-3">
             <label asp-for="Product!.Title" class="form-label"></label>
             <input asp-for="Product!.Title"
@@ -78,11 +94,11 @@
             </select>
             <span asp-validation-for="Product!.CoverTypeId" class="text-danger"></span>
         </div>
-        @if (Model.Product == null)
+        @if (Model.Product == null  || Model.Product?.Id == 0)
         {
             <button class="btn btn-warning me-3" onclick="return ValidateInput()">Create Product</button>
         }
-        else
+        @if(Model.Product != null && Model.Product.Id != 0)
         {
             <button class="btn btn-warning me-3">Edit Product</button>
         }
@@ -97,6 +113,16 @@
         //<partial name="_ValidationScriptsPartial" />
     }
     <script >
+        tinymce.init({
+          selector: 'textarea',
+          plugins: 'a11ychecker advcode casechange export formatpainter image editimage linkchecker autolink lists checklist media mediaembed pageembed permanentpen powerpaste table advtable tableofcontents tinycomments tinymcespellchecker',
+          toolbar: 'a11ycheck addcomment showcomments casechange checklist code export formatpainter image editimage pageembed permanentpen table tableofcontents',
+          toolbar_mode: 'floating',
+          tinycomments_mode: 'embedded',
+          tinycomments_author: 'Author name',
+        });
+    
+    
     function ValidateInput() {
     		if (document.getElementById("uploadBox").value === "") {
     			Swal.fire({
