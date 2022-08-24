@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using BookStore.DataAccess.Repository.IRepository;
 using BookStore.Models;
 
 namespace BookStoreWeb.Areas.Customer.Controllers
@@ -8,21 +9,40 @@ namespace BookStoreWeb.Areas.Customer.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
         {
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(string id)
+        public async Task<IActionResult> Index()
         {
-            ViewBag.Id = id;
-            return View();
+            var products = await _unitOfWork.ProductRepository
+                                                  .GetAllAsync("Category,CoverType");
+
+            return View(products);
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> Details(int? id)
         {
-            return View();
+
+            
+            if (id is 0 or null)
+            {
+                return NotFound();
+            }
+
+            var shoppingCart = new ShoppingCart()
+            {
+                Product = await _unitOfWork.ProductRepository
+                    .GetFirstOrDefaultAsync(
+                        p => p.Id == id,
+                        "Category,CoverType")
+            };
+            
+            return View(shoppingCart);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

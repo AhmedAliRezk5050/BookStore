@@ -1,10 +1,29 @@
-﻿@{
+﻿@model IEnumerable<Product>?
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">@ViewBag.Id</h1>
-    <h1 class="display-4">@ViewBag.Id</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">w Web apps with ASP.NET Core</a>.</p>
-    <p>Learndsd about <a href="https://docs.microsoft.com/aspnet/core">w Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    @foreach (var product in Model ?? Array.Empty<Product>())
+    {
+        <div class="col-10 offset-1 offset-sm-0 col-sm-6 col-md-4 col-lg-3 mb-2">
+            <div class="card rounded">
+                <img src="/images/products/@product.ImageUrl" alt="@product.Title" class="card-img-top rounded">
+                <div class="card-body">
+                    <p class="card-title h5 text-primary">@product.Title</p>
+                    <p class="card-title text-info">@product.Author</p>
+                    <p class="">
+                        List Price:
+                        <strick>
+                            <b>$@product.ListPrice</b>
+                        </strick>
+                    </p>
+                    <p class="">
+                        As low as: <b>$@product.Price100</b>
+                    </p>
+                </div>
+                <a asp-action="Details"  asp-route-id="@product.Id" class="btn btn-primary">Details</a>
+            </div>
+        </div>
+    }
 </div>
