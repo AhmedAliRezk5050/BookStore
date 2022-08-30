@@ -2,6 +2,8 @@ using BookStore.DataAccess;
 using BookStore.DataAccess.Repository;
 using BookStore.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace BookStoreWeb;
 
@@ -21,6 +23,11 @@ public class Program
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         builder.Services.AddControllersWithViews();
+
+        builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                //options.SignIn.RequireConfirmedAccount = true
+            }).AddEntityFrameworkStores<DataContext>(); 
 
         if (builder.Environment.IsDevelopment())
         {
@@ -43,7 +50,11 @@ public class Program
 
         app.UseRouting();
 
+        app.UseAuthentication();
+
         app.UseAuthorization();
+
+        app.MapRazorPages();
 
         app.MapControllerRoute(
             name: "default",
@@ -75,3 +86,4 @@ public class Program
         }
     }
 }
+
