@@ -14,5 +14,7 @@ namespace BookStore.DataAccess
         public DbSet<CoverType> CoverTypes { get; set; } = null!;
 
         public DbSet<Product> Products { get; set; } = null!;
+
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; } = null!;
     }
 }
