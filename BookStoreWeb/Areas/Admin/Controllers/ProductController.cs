@@ -104,6 +104,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                             productViewModel.Product!.ImageUrl = uniqueFileName;
                         }
 
+                        
                         await _unitOfWork.ProductRepository.Update(productViewModel.Product!);
                         await _unitOfWork.SaveAsync();
                         TempData["success"] = "Product updated successfully";
@@ -124,6 +125,12 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
             productViewModel.CoverTypesSelectList = (await _unitOfWork.CoverTyeRepository
                 .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+
+
+
+            productViewModel.Product!.ImageUrl = (await _unitOfWork.ProductRepository
+            .GetFirstOrDefaultAsync(p => p.Id == productViewModel.Product!.Id))!.ImageUrl;
+
 
             return View(productViewModel);
         }

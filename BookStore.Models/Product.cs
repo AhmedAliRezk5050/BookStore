@@ -47,6 +47,8 @@ namespace BookStore.Models
         [DisplayName("Price for 100+")]
         public double? Price100 { get; set; }
 
+        [Required]
+        [ValidateNever]
         [DisplayName("Image Url")]
         public string? ImageUrl { get; set; }
 
