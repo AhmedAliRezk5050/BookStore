@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Hosting;
+using NuGet.Packaging;
 
 namespace BookStoreWeb.Areas.Admin.Controllers
 {
@@ -34,47 +35,93 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
         public async Task<IActionResult> Upsert(int? id)
         {
-            ProductViewModel productViewModel = new();
-            productViewModel.CategoriesSelectList = (await _unitOfWork.CategoryRepository
+            UpsertProductViewModel upsertProductViewModel = new();
+
+            upsertProductViewModel.CategoriesSelectList = (await _unitOfWork.CategoryRepository
+                .GetAllAsync()).Select(c =>
+                                new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+
+            upsertProductViewModel.CoverTypesSelectList = (await _unitOfWork.CoverTyeRepository
                 .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
 
-            productViewModel.CoverTypesSelectList = (await _unitOfWork.CoverTyeRepository
-                .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
 
             if (id is null or 0)
             {
-                return View(productViewModel);
+                return View(upsertProductViewModel);
             }
             else
             {
-                productViewModel.Product = await _unitOfWork.ProductRepository.GetFirstOrDefaultAsync(p => p.Id == id);
-                return View(productViewModel);
+                var product = await _unitOfWork.ProductRepository.GetFirstOrDefaultAsync(p => p.Id == id);
+
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                upsertProductViewModel.Id = product.Id;
+                upsertProductViewModel.Title = product.Title;
+                upsertProductViewModel.Description = product.Description;
+                upsertProductViewModel.ISBN = product.ISBN;
+                upsertProductViewModel.Author = product.Author;
+                upsertProductViewModel.ListPrice = product.ListPrice;
+                upsertProductViewModel.Price = product.Price;
+                upsertProductViewModel.Price50 = product.Price50;
+                upsertProductViewModel.Price100 = product.Price100;
+                upsertProductViewModel.ImageUrl = product.ImageUrl;
+                upsertProductViewModel.CategoryId = product.Category.Id;
+                upsertProductViewModel.CoverTypeId = product.CoverType.Id;
+
+                return View(upsertProductViewModel);
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Upsert(ProductViewModel productViewModel, IFormFile? formFile)
+        public async Task<IActionResult> Upsert(UpsertProductViewModel upsertProductViewModel, IFormFile? formFile)
         {
-            if (productViewModel.Product?.Id is 0)
+            if (!ModelState.IsValid)
             {
-                // create
+                upsertProductViewModel.CategoriesSelectList = (await _unitOfWork.CategoryRepository
+              .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+
+                upsertProductViewModel.CoverTypesSelectList = (await _unitOfWork.CoverTyeRepository
+                    .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
+
+                return View(upsertProductViewModel);
+            }
+
+
+            if (upsertProductViewModel.Id is 0)
+            {
                 try
                 {
-                    if (ModelState.IsValid)
+                    if (formFile != null)
                     {
-                        if (formFile is not null)
-                        {
-                            string? uniqueFileName = UploadedFile(formFile);
-
-                            productViewModel.Product!.ImageUrl = uniqueFileName;
-                        }
-
-                        _unitOfWork.ProductRepository.Add(productViewModel.Product!);
-                        await _unitOfWork.SaveAsync();
-                        TempData["success"] = "Product created successfully";
-                        return RedirectToAction(nameof(Index));
+                        string? uniqueFileName = UploadedFile(formFile);
+                        upsertProductViewModel.ImageUrl = Path.Join("/images", "products", uniqueFileName);
                     }
+
+                    Product product = new()
+                    {
+                        Id = upsertProductViewModel.Id,
+                        Title = upsertProductViewModel.Title,
+                        Description = upsertProductViewModel.Description,
+                        ISBN = upsertProductViewModel.ISBN,
+                        Author = upsertProductViewModel.Author,
+                        ListPrice = (double)upsertProductViewModel.ListPrice!,
+                        Price = (double)upsertProductViewModel.Price!,
+                        Price50 = (double)upsertProductViewModel.Price50!,
+                        Price100 = (double)upsertProductViewModel.Price100!,
+                        ImageUrl = upsertProductViewModel.ImageUrl!,
+                        Category = (await _unitOfWork.CategoryRepository
+                                    .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CategoryId))!,
+                        CoverType = (await _unitOfWork.CoverTyeRepository
+                                    .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CoverTypeId))!
+                    };
+                    _unitOfWork.ProductRepository.Add(product);
+                    await _unitOfWork.SaveAsync();
+                    TempData["success"] = "Product created successfully";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception e)
                 {
@@ -83,56 +130,56 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     ModelState.AddModelError("", "Unable to save changes. " +
                                                  "Try again, and if the problem persists, " +
                                                  "see your system administrator.");
+                    return View(upsertProductViewModel);
                 }
             }
-            else
+
+            // edit
+            try
             {
-                // edit
-                try
+                if (formFile is not null)
                 {
-                    if (ModelState.IsValid)
-                    {
-                        if (formFile is not null)
-                        {
-                            string? productOldImgUrl = (await _unitOfWork.ProductRepository
-                                .GetFirstOrDefaultAsync(p => p.Id == productViewModel.Product!.Id))!.ImageUrl;
+                    string? oldImgUrl = (await _unitOfWork.ProductRepository
+                        .GetFirstOrDefaultAsync(p => p.Id == upsertProductViewModel.Id))!.ImageUrl;
 
-                            string? toDeleteOldProductImg = Path.Combine(_webHostEnvironment.WebRootPath, "images",
-                                "products", productOldImgUrl!);
-                            System.IO.File.Delete(toDeleteOldProductImg);
-                            string? uniqueFileName = UploadedFile(formFile);
-                            productViewModel.Product!.ImageUrl = uniqueFileName;
-                        }
+                    string? oldImgFullUrl = Path.Join(_webHostEnvironment.WebRootPath, oldImgUrl);
 
-                        
-                        await _unitOfWork.ProductRepository.Update(productViewModel.Product!);
-                        await _unitOfWork.SaveAsync();
-                        TempData["success"] = "Product updated successfully";
-                        return RedirectToAction(nameof(Index));
-                    }
+                    System.IO.File.Delete(oldImgFullUrl);
+                    string? uniqueFileName = UploadedFile(formFile);
+                    upsertProductViewModel.ImageUrl = Path.Join("/images", "products", uniqueFileName);
                 }
-                catch (Exception e)
+
+                Product product = new()
                 {
-                    _logger.LogError(e, "An error occurred while updating the product.");
-                    ModelState.AddModelError("", "Unable to update changes. " +
-                                                 "Try again, and if the problem persists, " +
-                                                 "see your system administrator.");
-                }
+                    Id = upsertProductViewModel.Id,
+                    Title = upsertProductViewModel.Title,
+                    Description = upsertProductViewModel.Description,
+                    ISBN = upsertProductViewModel.ISBN,
+                    Author = upsertProductViewModel.Author,
+                    ListPrice = (double)upsertProductViewModel.ListPrice!,
+                    Price = (double)upsertProductViewModel.Price!,
+                    Price50 = (double)upsertProductViewModel.Price50!,
+                    Price100 = (double)upsertProductViewModel.Price100!,
+                    ImageUrl = upsertProductViewModel.ImageUrl!,
+                    Category = (await _unitOfWork.CategoryRepository
+                                    .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CategoryId))!,
+                    CoverType = (await _unitOfWork.CoverTyeRepository
+                                    .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CoverTypeId))!
+                };
+
+                await _unitOfWork.ProductRepository.Update(product);
+                await _unitOfWork.SaveAsync();
+                TempData["success"] = "Product updated successfully";
+                return RedirectToAction(nameof(Index));
             }
-
-            productViewModel.CategoriesSelectList = (await _unitOfWork.CategoryRepository
-                .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
-
-            productViewModel.CoverTypesSelectList = (await _unitOfWork.CoverTyeRepository
-                .GetAllAsync()).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() });
-
-
-
-            productViewModel.Product!.ImageUrl = (await _unitOfWork.ProductRepository
-            .GetFirstOrDefaultAsync(p => p.Id == productViewModel.Product!.Id))!.ImageUrl;
-
-
-            return View(productViewModel);
+            catch (Exception e)
+            {
+                _logger.LogError(e, "An error occurred while updating the product.");
+                ModelState.AddModelError("", "Unable to update changes. " +
+                                             "Try again, and if the problem persists, " +
+                                             "see your system administrator.");
+                return View(upsertProductViewModel);
+            }
         }
 
         #region API CALLS
@@ -157,8 +204,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
             {
                 _unitOfWork.ProductRepository.Remove(product);
                 await _unitOfWork.SaveAsync();
-                string toDeleteImgPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "products",
-                    product.ImageUrl!);
+                string toDeleteImgPath = Path.Join(_webHostEnvironment.WebRootPath, product.ImageUrl);
                 System.IO.File.Delete(toDeleteImgPath);
                 return Json(new { success = true, message = "Product deleted successfully" });
             }
@@ -169,7 +215,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
             }
         }
 
-        #endregion 
+        #endregion
 
         private void AddDeletionFailureTempData()
         {

@@ -38,15 +38,14 @@ namespace BookStore.DataAccess.Repository
             dbProduct.Price = productToUpdate.Price;
             dbProduct.Price50 = productToUpdate.Price50;
             dbProduct.Price100 = productToUpdate.Price100;
-            dbProduct.CategoryId = productToUpdate.CategoryId;
-            dbProduct.CoverTypeId = productToUpdate.CoverTypeId;
-             
-            if(productToUpdate.ImageUrl != null)
+            dbProduct.Category = productToUpdate.Category;
+            dbProduct.CoverType = productToUpdate.CoverType;
+
+            if (productToUpdate.ImageUrl != null)
             {
                 dbProduct.ImageUrl = productToUpdate.ImageUrl;
             }
-
-        }
+        } 
 
         protected virtual void Dispose(bool disposing)
         {
