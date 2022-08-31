@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="compilerconfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="compilerconfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
@@ -28,20 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="Views\CategoryTemp\Create.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\CategoryTemp\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\CategoryTemp\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\CategoryTemp\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\CategoryTemp\Index.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BookStore.DataAccess\BookStore.DataAccess.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\images\products" />
-    <Folder Include="wwwroot\images\products\" />
   </ItemGroup>
 
 </Project>
