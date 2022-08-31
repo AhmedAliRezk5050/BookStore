@@ -3,7 +3,7 @@ using BookStore.DataAccess.Repository;
 using BookStore.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-
+using System.Reflection;
 
 namespace BookStoreWeb;
 
@@ -12,6 +12,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddAutoMapper(Assembly.Load("BookStore.Models"));
 
         builder.Services.AddDbContext<DataContext>(options =>
             {
@@ -27,7 +29,9 @@ public class Program
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
             {
                 //options.SignIn.RequireConfirmedAccount = true
-            }).AddEntityFrameworkStores<DataContext>(); 
+            }).AddEntityFrameworkStores<DataContext>();
+
+       
 
         if (builder.Environment.IsDevelopment())
         {
