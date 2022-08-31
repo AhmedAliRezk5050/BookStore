@@ -5,12 +5,8 @@ namespace BookStore.Models
 {
     public class Category
     {
-        // Id is PK by convention
-        //for other names, [Key] must be used
-        //[Key]
         public int Id { get; set; }
 
-        // [Required] is not needed because NRT is enabled
         public string Name { get; set; } = null!;
         
         // ? and Required   to avoid '' in server side validation
