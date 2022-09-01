@@ -13,8 +13,6 @@ namespace BookStore.Models.AutoMapper
         public MappingProfile()
         {
             CreateMap<Product, UpsertProductViewModel>()
-                .ForMember(dest => dest.CategoryId, src => src.MapFrom(src => src.Category.Id))
-                .ForMember(dest => dest.CoverTypeId, src => src.MapFrom(src => src.CoverType.Id))
                 .ReverseMap();
         }
     }

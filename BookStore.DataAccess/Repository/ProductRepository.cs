@@ -38,8 +38,8 @@ namespace BookStore.DataAccess.Repository
             dbProduct.Price = productToUpdate.Price;
             dbProduct.Price50 = productToUpdate.Price50;
             dbProduct.Price100 = productToUpdate.Price100;
-            dbProduct.Category = productToUpdate.Category;
-            dbProduct.CoverType = productToUpdate.CoverType;
+            dbProduct.CategoryId = productToUpdate.CategoryId;
+            dbProduct.CoverTypeId = productToUpdate.CoverTypeId;
 
             if (productToUpdate.ImageUrl != null)
             {

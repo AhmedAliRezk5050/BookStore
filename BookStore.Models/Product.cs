@@ -32,7 +32,11 @@ namespace BookStore.Models
 
         public string ImageUrl { get; set; } = null!;
 
+        public int CategoryId { get; set; }
+
         public Category Category { get; set; } = null!;
+
+        public int CoverTypeId { get; set; }
 
         public CoverType CoverType { get; set; } = null!;
     }

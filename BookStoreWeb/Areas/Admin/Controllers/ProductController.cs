@@ -95,15 +95,9 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                         upsertProductViewModel.ImageUrl = Path.Join("/images", "products", uniqueFileName);
                     }
 
-                    product = new()
-                    {
-                        Category = (await _unitOfWork.CategoryRepository
-                                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CategoryId))!,
-                        CoverType = (await _unitOfWork.CoverTyeRepository
-                                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CoverTypeId))!
-                    };
+                    var x = _mapper.Map(upsertProductViewModel, product);
 
-                    _unitOfWork.ProductRepository.Add(_mapper.Map(upsertProductViewModel, product));
+                    _unitOfWork.ProductRepository.Add(x);
                     await _unitOfWork.SaveAsync();
                     TempData["success"] = "Product created successfully";
                     return RedirectToAction(nameof(Index));
@@ -133,13 +127,13 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     upsertProductViewModel.ImageUrl = Path.Join("/images", "products", uniqueFileName);
                 }
 
-                product = new()
-                {
-                    Category = (await _unitOfWork.CategoryRepository
-                                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CategoryId))!,
-                    CoverType = (await _unitOfWork.CoverTyeRepository
-                                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CoverTypeId))!
-                };
+                //product = new()
+                //{
+                //    Category = (await _unitOfWork.CategoryRepository
+                //                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CategoryId))!,
+                //    CoverType = (await _unitOfWork.CoverTyeRepository
+                //                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CoverTypeId))!
+                //};
 
                 await _unitOfWork.ProductRepository.Update(_mapper.Map(upsertProductViewModel, product));
                 await _unitOfWork.SaveAsync();
