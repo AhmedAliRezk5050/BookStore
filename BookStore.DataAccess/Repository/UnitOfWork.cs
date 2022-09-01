@@ -14,6 +14,8 @@ public class UnitOfWork : IUnitOfWork
 
     public IProductRepository ProductRepository { get; private set;}
 
+    public ICompanyRepository CompanyRepository { get; private set;}
+
     public UnitOfWork(DataContext context)
     {
         _context = context;
@@ -23,6 +25,8 @@ public class UnitOfWork : IUnitOfWork
         CoverTyeRepository = new CoverTypeRepository(_context);
 
         ProductRepository = new ProductRepository(_context);
+
+        CompanyRepository = new CompanyRepository(_context);
     }
     
     

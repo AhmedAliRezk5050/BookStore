@@ -1,0 +1,61 @@
+﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@model UpsertCompanyViewModel;
+
+<form asp-action="Upsert">
+    <div class="" asp-validation-summary="ModelOnly"></div>
+    <div class="border p-3 mt-4">
+        <div class="mb-2">
+            <h2> @(Model.Id == 0 ? "Create" : "Edit") Company</h2>
+            <hr />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name"
+                   class="form-control">
+            <span class="text-danger" asp-validation-for="Name"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="StreetAddress" class="form-label"></label>
+            <textarea asp-for="StreetAddress" class="form-control"></textarea>
+            <span class="text-danger" asp-validation-for="StreetAddress"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="City" class="form-label"></label>
+            <input asp-for="City"
+                   class="form-control">
+            <span class="text-danger" asp-validation-for="City"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="State" class="form-label"></label>
+            <input asp-for="State"
+                   class="form-control">
+            <span class="text-danger" asp-validation-for="State"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="PostalCode" class="form-label"></label>
+            <input asp-for="PostalCode" class="form-control">
+            <span class="text-danger" asp-validation-for="PostalCode"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input  asp-for="PhoneNumber" class="form-control">
+            <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+        </div>
+
+        <button class="btn btn-warning me-3" onclick="return ValidateInput()">
+            @(Model.Id == 0 ? "Create" : "Edit") Company
+        </button>
+
+        <a asp-action="Index" class="btn btn-outline-primary">Back</a>
+    </div>
+</form>
+
+
+
+@section Scripts
+    {
+        @{
+            <partial name="_ValidationScriptsPartial" />
+        }
+    }

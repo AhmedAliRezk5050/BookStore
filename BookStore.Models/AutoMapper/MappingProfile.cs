@@ -14,6 +14,9 @@ namespace BookStore.Models.AutoMapper
         {
             CreateMap<Product, UpsertProductViewModel>()
                 .ReverseMap();
+
+            CreateMap<Company, UpsertCompanyViewModel>()
+                .ReverseMap();
         }
     }
 }

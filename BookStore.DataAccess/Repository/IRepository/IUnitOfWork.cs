@@ -8,6 +8,8 @@ public interface IUnitOfWork : IDisposable
 
     IProductRepository ProductRepository { get; }
 
+    ICompanyRepository CompanyRepository { get; }
+
     void Save();
     
     Task SaveAsync();
