@@ -8,19 +8,20 @@ using System.Threading.Tasks;
 
 namespace BookStore.Models
 {
-    public class ApplicationUser : IdentityUser
-    {
-        // all properties will be nullable in DB
-        // because IdentityUser doesn't have them
-        [Required]
-        public string Name { get; set; } = null!;
-        
-        public string? StreetAddress { get; set; } = null!;
-                     
-        public string? City { get; set; } = null!;
-                     
-        public string? State { get; set; } = null!;
-                     
-        public string? PostalCode { get; set; } = null!;
-    }
+  public class ApplicationUser : IdentityUser
+  {
+    public string? Name { get; set; }
+
+    public string? StreetAddress { get; set; }
+
+    public string? City { get; set; }
+
+    public string? State { get; set; }
+
+    public string? PostalCode { get; set; }
+
+    public int? CompanyId { get; set; }
+
+    public Company? Company { get; set; }
+  }
 }
