@@ -95,9 +95,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                         upsertProductViewModel.ImageUrl = Path.Join("/images", "products", uniqueFileName);
                     }
 
-                    var x = _mapper.Map(upsertProductViewModel, product);
-
-                    _unitOfWork.ProductRepository.Add(x);
+                    _unitOfWork.ProductRepository.Add(_mapper.Map(upsertProductViewModel, product));
                     await _unitOfWork.SaveAsync();
                     TempData["success"] = "Product created successfully";
                     return RedirectToAction(nameof(Index));
@@ -126,14 +124,6 @@ namespace BookStoreWeb.Areas.Admin.Controllers
                     string? uniqueFileName = UploadedFile(formFile);
                     upsertProductViewModel.ImageUrl = Path.Join("/images", "products", uniqueFileName);
                 }
-
-                //product = new()
-                //{
-                //    Category = (await _unitOfWork.CategoryRepository
-                //                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CategoryId))!,
-                //    CoverType = (await _unitOfWork.CoverTyeRepository
-                //                   .GetFirstOrDefaultAsync(c => c.Id == upsertProductViewModel.CoverTypeId))!
-                //};
 
                 await _unitOfWork.ProductRepository.Update(_mapper.Map(upsertProductViewModel, product));
                 await _unitOfWork.SaveAsync();
@@ -210,7 +200,6 @@ namespace BookStoreWeb.Areas.Admin.Controllers
         /// delete product by imgage url which combined with the absolute path of the directory
         /// </summary>
         /// <param name="imgUrl"></param>
-
         private void DeleteProduct(string imgUrl)
         {
             if (imgUrl == null) return;
