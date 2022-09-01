@@ -29,7 +29,7 @@ public class Program
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
             {
                 //options.SignIn.RequireConfirmedAccount = true
-            }).AddEntityFrameworkStores<DataContext>();
+            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
 
        
 
