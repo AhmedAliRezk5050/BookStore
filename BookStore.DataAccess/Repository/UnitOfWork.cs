@@ -10,15 +10,17 @@ public class UnitOfWork : IUnitOfWork
 
     public ICategoryRepository CategoryRepository { get; private set; }
     
-    public ICoverTyeRepository CoverTyeRepository { get; private set;}
+    public ICoverTyeRepository CoverTyeRepository { get;}
 
-    public IProductRepository ProductRepository { get; private set;}
+    public IProductRepository ProductRepository { get;}
 
-    public ICompanyRepository CompanyRepository { get; private set;}
+    public ICompanyRepository CompanyRepository { get;}
 
-    public IShoppingCartRepository ShoppingCartRepository { get; private set;}
+    public IShoppingCartRepository ShoppingCartRepository { get;}
 
-    public IApplicationUserRepository ApplicationUserRepository { get; private set;}
+    public IApplicationUserRepository ApplicationUserRepository { get;}
+    public IOrderRepository OrderRepository { get; }
+    public IOrderDetailRepository OrderDetailRepository { get; }
 
     public UnitOfWork(DataContext context)
     {
@@ -35,6 +37,10 @@ public class UnitOfWork : IUnitOfWork
         ShoppingCartRepository = new ShoppingCartRepository(_context);
 
         ApplicationUserRepository = new ApplicationUserRepository(_context);
+
+        OrderRepository = new OrderRepository(_context);
+
+        OrderDetailRepository = new OrderDetailRepository(_context);
     }
     
     

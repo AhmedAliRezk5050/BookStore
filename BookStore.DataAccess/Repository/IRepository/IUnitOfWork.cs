@@ -13,6 +13,10 @@ public interface IUnitOfWork : IDisposable
     IShoppingCartRepository ShoppingCartRepository { get; }
 
     IApplicationUserRepository ApplicationUserRepository { get; }
+    
+    IOrderRepository OrderRepository { get; }
+    
+    IOrderDetailRepository OrderDetailRepository { get; }
 
     void Save();
     
