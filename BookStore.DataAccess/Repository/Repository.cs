@@ -35,9 +35,14 @@ namespace BookStore.DataAccess.Repository
             return query.ToList();
         }
 
-        public Task<List<T>> GetAllAsync(string includedProperties = "")
+        public Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string includedProperties = "")
         {
             IQueryable<T> query = dbSet;
+
+            if (filter is not null)
+            {
+                query = query.Where(filter);
+            }
 
             foreach (var c in includedProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
             {

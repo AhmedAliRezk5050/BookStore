@@ -23,7 +23,7 @@ namespace BookStoreWeb.Areas.Customer.Controllers
         public async Task<IActionResult> Index()
         {
             var products = await _unitOfWork.ProductRepository
-                .GetAllAsync("Category,CoverType");
+                .GetAllAsync(includedProperties: "Category,CoverType");
 
             return View(products);
         }

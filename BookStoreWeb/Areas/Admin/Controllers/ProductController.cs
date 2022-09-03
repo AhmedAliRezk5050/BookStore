@@ -144,7 +144,7 @@ namespace BookStoreWeb.Areas.Admin.Controllers
 
         public async Task<IActionResult> GetAll()
         {
-            var products = await _unitOfWork.ProductRepository.GetAllAsync("Category,CoverType");
+            var products = await _unitOfWork.ProductRepository.GetAllAsync(includedProperties: "Category,CoverType");
             return Json(new { data = products });
         }
 

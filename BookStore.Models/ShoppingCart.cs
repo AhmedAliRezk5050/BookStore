@@ -1,4 +1,6 @@
-﻿namespace BookStore.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BookStore.Models;
 
 public class ShoppingCart
 {
@@ -13,5 +15,8 @@ public class ShoppingCart
     public string ApplicationUserId { get; set; } = null!;
 
     public ApplicationUser ApplicationUser { get; set; } = null!;
+
+    [NotMapped]
+    public double Price { get; set; }
 
 }

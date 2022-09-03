@@ -13,7 +13,7 @@ namespace BookStore.DataAccess.Repository.IRepository
         Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includedProperties = "");
 
         IEnumerable<T> GetAll();
-        Task<List<T>> GetAllAsync(string includedProperties = "");
+        Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string includedProperties = "");
 
         void Add(T entity);
 

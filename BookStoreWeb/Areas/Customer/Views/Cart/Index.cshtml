@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ShoppingCart>?
+﻿@model CartViewModel
 
 <form method="post">
     <br/>
@@ -18,11 +18,11 @@
 
 
             <div class="card-body">
-                @foreach (var c in Model ?? Array.Empty<ShoppingCart>())
+                @foreach (var c in Model.Carts)
                 {
-                    <div class="row">
+                    <div class="row" id="count-row-@c.Id">
                         <div class="d-none d-lg-block col-lg-1 text-center py-2">
-                            <img src="@c.Product.ImageUrl" class="rounded" width="100%"/>
+                            <img src="@c.Product.ImageUrl" alt="@c.Product.Title" class="rounded" width="100%"/>
                         </div>
                         <div class="col-12 col-lg-6 pt-md-3">
                             <h5>
@@ -37,26 +37,26 @@
                                 <h6>
                                     <strong>
                                         <span class="text-muted">
-                                            @($"{c.Product.Price:C}") &nbsp;x&nbsp; @c.Count
-                                        </span>
+                                            @($"{c.Price:C}") &nbsp;x&nbsp; <span id="count-@c.Id">@c.Count</span>
+                                        </span> 
                                     </strong>
                                 </h6>
                             </div>
                             <div class="col-6 col-sm-4 col-lg-6 pt-2">
                                 <div class="w-75 btn-group" role="group">
-                                    <a class="btn btn-primary">
+                                    <button type="button" class="btn btn-primary" onclick="increment(this, @c.Id, @c.Price)">
                                         <i class="bi bi-plus-square"></i>
-                                    </a> &nbsp;
-                                    <a class="btn btn-warning">
+                                    </button> &nbsp;
+                                    <button type="button" class="btn btn-warning" onclick="decrement(this, @c.Id, @c.Price)">
                                         <i class="bi bi-dash-square"></i>
-                                    </a>
+                                    </button>
                                 </div>
 
                             </div>
                             <div class="col-2 col-sm-4 col-lg-2 text-right pt-2">
-                                <a class="btn btn-danger">
+                                <button type="button" class="btn btn-danger" onclick="deleteCart(this, @c.Id, @c.Price)">
                                     <i class="bi bi-trash-fill"></i>
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                         <ul class="list-group">
                             <li class="list-group-item d-flex justify-content-between bg-light">
                                 <span class="text-info"> Total (USD)</span>
-                                <strong class="text-info"></strong>
+                                <strong class="text-info" id="total-price">@($"{Model.TotalPrice:C}")</strong>
                             </li>
                         </ul>
                     </div>
@@ -84,3 +84,69 @@
         </div>
     </div>
 </form>
+
+@section Scripts
+{
+    <script>
+     function increment(el, id, price) {
+        $.ajax({
+            url: `/Customer/Cart/Increment/${id}`,
+            type: "GET",
+            success: function ({count}) {
+                alert("success");
+                 $(`#count-${id}`).text(count);
+                 const totalPriceElem = $("#total-price");
+                 let totalPrice = +totalPriceElem.text().replace(/[$,]/g, '');
+                 totalPrice += price;
+                 totalPriceElem.text(`$${totalPrice.toFixed(2)}`);
+                 
+            },
+            error: function () {
+                  alert("error");
+             }
+        });
+        }
+     function decrement(el, id, price) {
+        $.ajax({
+            url: `/Customer/Cart/Decrement/${id}`,
+            type: "GET",
+            success: function ({count}) {
+                alert("success");
+                  const totalPriceElem = $("#total-price");
+                  let totalPrice = +totalPriceElem.text().replace(/[$,]/g, '');
+                  totalPrice -= price;
+                  totalPriceElem.text(`$${totalPrice.toFixed(2)}`); 
+                if(count > 0) {
+                    $(`#count-${id}`).text(count);
+                } else {
+                    $(`#count-${id}`).closest(`#count-row-${id}`).remove();
+                    }
+            },
+            error: function () {
+                  alert("error");
+             }
+        });
+        }
+     function deleteCart(el, id, price) {
+        $.ajax({
+            url: `/Customer/Cart/Delete/${id}`,
+            type: "DELETE",
+            success: function ({count}) {
+                alert("success");
+                $(`#count-${id}`).closest(`#count-row-${id}`).remove();
+                 const totalPriceElem = $("#total-price");
+                 let totalPrice = +totalPriceElem.text().replace(/[$,]/g, '');
+                 totalPrice -= count*price;
+                 totalPriceElem.text(`$${totalPrice.toFixed(2)}`); 
+            },
+            error: function () {
+                  alert("error");
+             }
+        });
+        }
+        
+        function calcTotalPrice(total, count, price) {
+            return total - count * price
+         }
+    </script>
+}
