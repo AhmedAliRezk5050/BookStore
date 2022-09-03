@@ -20,5 +20,9 @@ namespace BookStore.DataAccess
         public DbSet<ApplicationUser> ApplicationUsers { get; set; } = null!;
 
         public DbSet<ShoppingCart> ShoppingCarts { get; set; } = null!;
+        
+        public DbSet<Order> Orders { get; set; } = null!;
+        
+        public DbSet<OrderDetail> OrderDetails { get; set; } = null!;
     }
 }
