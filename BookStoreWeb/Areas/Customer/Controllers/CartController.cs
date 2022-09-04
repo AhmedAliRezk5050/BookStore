@@ -46,6 +46,20 @@ public class CartController : Controller
         return View(CartViewModel);
     }
 
+    public async Task<IActionResult> Summary()
+    {
+        var userClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        var currentUserId = userClaim!.Value;
+        var carts = await _unitOfWork.ShoppingCartRepository.GetAllAsync(
+            cart => cart.ApplicationUserId == currentUserId,
+            includedProperties: "ApplicationUser,Product");
+        
+        
+        return View();
+    }
+    
+    #region API
+
     public async Task<IActionResult> Increment(int id)
     {
         var cart = await _unitOfWork.ShoppingCartRepository
@@ -53,7 +67,7 @@ public class CartController : Controller
         if (cart is null) return BadRequest();
         _unitOfWork.ShoppingCartRepository.IncrementCount(cart);
         await _unitOfWork.SaveAsync();
-        return Ok(new { count = cart.Count, price =cart.Price });
+        return Ok(new { count = cart.Count, price = cart.Price });
     }
 
 
@@ -72,7 +86,7 @@ public class CartController : Controller
         }
 
         await _unitOfWork.SaveAsync();
-        return Ok(new { count = cart.Count});
+        return Ok(new { count = cart.Count });
     }
 
     [HttpDelete]
@@ -95,4 +109,6 @@ public class CartController : Controller
 
         return Ok(new { count = cart.Count });
     }
+
+    #endregion
 }
