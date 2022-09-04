@@ -167,7 +167,7 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
                 user.City = Input.City;
                 user.State = Input.State;
                 user.PostalCode = Input.PostalCode;
-                if(Input.RoleName == SD.Role_User_Comp)
+                if(Input.RoleName == SD.CompanyUserRole)
                 {
                     user.CompanyId = Input.CompanyId;
                 }
@@ -180,7 +180,7 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     var addRoleToUserResult = await _userManager.AddToRoleAsync(user,
-                        Input.RoleName ?? SD.Role_User_Indi);
+                        Input.RoleName ?? SD.IndividualUserRole);
 
                     if (!addRoleToUserResult.Succeeded)
                     {

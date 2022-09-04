@@ -12,22 +12,22 @@ namespace BookStore.DataAccess.Migrations
             migrationBuilder.InsertData(
                     table: "AspNetRoles",
                     columns: new[] { "Id", "Name", "NormalizedName", "ConcurrencyStamp" },
-                    values: new object[] { Guid.NewGuid().ToString(), SD.Role_User_Indi, SD.Role_User_Indi, Guid.NewGuid().ToString() }
+                    values: new object[] { Guid.NewGuid().ToString(), SD.IndividualUserRole, SD.IndividualUserRole, Guid.NewGuid().ToString() }
                 );
             migrationBuilder.InsertData(
                     table: "AspNetRoles",
                     columns: new[] { "Id", "Name", "NormalizedName", "ConcurrencyStamp" },
-                    values: new object[] { Guid.NewGuid().ToString(), SD.Role_User_Comp, SD.Role_User_Comp, Guid.NewGuid().ToString() }
+                    values: new object[] { Guid.NewGuid().ToString(), SD.CompanyUserRole, SD.CompanyUserRole, Guid.NewGuid().ToString() }
                 );
             migrationBuilder.InsertData(
                     table: "AspNetRoles",
                     columns: new[] { "Id", "Name", "NormalizedName", "ConcurrencyStamp" },
-                    values: new object[] { Guid.NewGuid().ToString(), SD.Role_Admin, SD.Role_Admin, Guid.NewGuid().ToString() }
+                    values: new object[] { Guid.NewGuid().ToString(), SD.AdminRole, SD.AdminRole, Guid.NewGuid().ToString() }
                 );
             migrationBuilder.InsertData(
                     table: "AspNetRoles",
                     columns: new[] { "Id", "Name", "NormalizedName", "ConcurrencyStamp" },
-                    values: new object[] { Guid.NewGuid().ToString(), SD.Role_Employee, SD.Role_Employee, Guid.NewGuid().ToString() }
+                    values: new object[] { Guid.NewGuid().ToString(), SD.EmployeeRole, SD.EmployeeRole, Guid.NewGuid().ToString() }
                 );
         }
 

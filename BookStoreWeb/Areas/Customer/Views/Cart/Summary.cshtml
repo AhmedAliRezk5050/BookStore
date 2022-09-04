@@ -1,5 +1,6 @@
-﻿@*<form method="post">
-    <br/>
+﻿@model SummaryViewModel
+
+<form asp-action="Summary">
     <div class="container">
         <div class="card">
             <div class="card-header bg-dark text-light ml-0">
@@ -27,8 +28,8 @@
                                     <label>Name</label>
                                 </div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.Name" class="form-control"/>
-                                    <span asp-validation-for="OrderHeader.Name" class="text-danger"></span>
+                                    <input asp-for="Name" class="form-control"/>
+                                    <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="row my-1">
@@ -36,8 +37,8 @@
                                     <label>Phone</label>
                                 </div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.PhoneNumber" class="form-control"/>
-                                    <span asp-validation-for="OrderHeader.PhoneNumber" class="text-danger"></span>
+                                    <input asp-for="PhoneNumber" class="form-control"/>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="row my-1">
@@ -45,8 +46,8 @@
                                     <label>Street Address</label>
                                 </div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.StreetAddress" class="form-control"/>
-                                    <span asp-validation-for="OrderHeader.StreetAddress" class="text-danger"></span>
+                                    <input asp-for="StreetAddress" class="form-control"/>
+                                    <span asp-validation-for="StreetAddress" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="row my-1">
@@ -54,8 +55,8 @@
                                     <label>City</label>
                                 </div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.City" class="form-control"/>
-                                    <span asp-validation-for="OrderHeader.City" class="text-danger"></span>
+                                    <input asp-for="City" class="form-control"/>
+                                    <span asp-validation-for="City" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="row my-1">
@@ -63,8 +64,8 @@
                                     <label>State</label>
                                 </div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.State" class="form-control"/>
-                                    <span asp-validation-for="OrderHeader.State" class="text-danger"></span>
+                                    <input asp-for="State" class="form-control"/>
+                                    <span asp-validation-for="State" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="row my-1">
@@ -72,8 +73,8 @@
                                     <label>Postal Code</label>
                                 </div>
                                 <div class="col-9">
-                                    <input asp-for="OrderHeader.PostalCode" class="form-control"/>
-                                    <span asp-validation-for="OrderHeader.PostalCode" class="text-danger"></span>
+                                    <input asp-for="PostalCode" class="form-control"/>
+                                    <span asp-validation-for="PostalCode" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -82,19 +83,19 @@
                                 <span class="text-info">Order Summary:</span>
                             </h4>
                             <ul class="list-group mb-3">
-                                @foreach (var details in Model.ListCart)
+                                @foreach (var c in Model.Carts)
                                 {
                                     <li class="list-group-item d-flex justify-content-between">
                                         <div>
-                                            <h6 class="my-0">@details.Product.Title</h6>
-                                            <small class="text-muted">Quantity: @details.Count</small>
+                                            <h6 class="my-0">@c.Product.Title</h6>
+                                            <small class="text-muted">Quantity: @c.Count</small>
                                         </div>
-                                        <span class="text-muted">@((details.Price * details.Count).ToString("c")) </span>
+                                        <span class="text-muted">@($"{c.Price * c.Count:C}")</span>
                                     </li>
                                 }
                                 <li class="list-group-item d-flex justify-content-between bg-light">
                                     <small class="text-info">Total (USD)</small>
-                                    <strong class="text-info">@Model.OrderHeader.OrderTotal.ToString("c")</strong>
+                                    <strong class="text-info">@($"{@Model.TotalPrice:C}")</strong>
                                 </li>
                             </ul>
                         </div>
@@ -116,4 +117,4 @@
             </div>
         </div>
     </div>
-</form>*@
+</form>
