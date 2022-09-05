@@ -13,10 +13,10 @@ function loadDataTable() {
                 dataSrc:""
             },
             "columns": [
-                { "data": "id", "width": "15%"},
-                { "data": "name", "width": "15%"},
+                { "data": "id", "width": "5%"},
+                { "data": "name", "width": "20%"},
                 { "data": "phoneNumber", "width": "15%"},
-                { "data": "applicationUser.email", "width": "15%"},
+                { "data": "applicationUser.email", "width": "20%"},
                 { "data": "orderStatus", "width": "15%"},
                 { "data": "orderTotal", "width": "15%"},
                 {
@@ -24,13 +24,13 @@ function loadDataTable() {
                     "render": function (data) {
                         return `
                                  <div class="d-flex justify-content-center gap-2">
-                                        <a href="/Admin/Order/Details/${data}" class="btn btn-success d-inline-flex gap-1">
-                                            <i class="bi bi-pencil-square"></i>Details
+                                        <a href="/Admin/Order/Details/${data}" class="btn btn-warning d-inline-flex gap-1">
+                                            <i class="bi bi-card-text"></i>
                                         </a>
                                  </div>  
                         `;
                     },
-                    "width": "15%"
+                    "width": "5%"
                 }
             ]
         }
