@@ -12,5 +12,7 @@ namespace BookStore.DataAccess.Repository.IRepository
         void Update(Order order);
         
         Task UpdateStatus(int id, string orderStatus, string? paymentStatus = null);
+        
+        Task UpdateStripePayment(int id, string sessionId, string paymentIntentId);
     }
 }

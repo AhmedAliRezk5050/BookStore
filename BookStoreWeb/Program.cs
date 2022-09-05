@@ -4,6 +4,8 @@ using BookStore.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
+using BookStore.Utility;
+using Stripe;
 
 namespace BookStoreWeb;
 
@@ -15,6 +17,8 @@ public class Program
 
         builder.Services.AddAutoMapper(Assembly.Load("BookStore.Models"));
 
+        builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+        
         builder.Services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("BookStoreConnection"));
@@ -54,6 +58,8 @@ public class Program
 
         app.UseRouting();
 
+        StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:Secretkey").Get<string>();
+
         app.UseAuthentication();
 
         app.UseAuthorization();
@@ -64,7 +70,7 @@ public class Program
             name: "default",
             pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
-        SeedDb(app);
+        // SeedDb(app);
 
         app.Run();
     }

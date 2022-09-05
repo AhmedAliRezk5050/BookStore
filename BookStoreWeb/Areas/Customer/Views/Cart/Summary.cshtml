@@ -1,4 +1,7 @@
 ﻿@model SummaryViewModel
+@using Microsoft.Extensions.Options
+@using BookStore.Utility
+@inject IOptions<StripeSettings> Stripe
 
 <form asp-action="Summary">
     <div class="container">

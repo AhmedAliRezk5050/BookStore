@@ -5,6 +5,8 @@ using BookStore.Models.ViewModels;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
+using Stripe.Checkout;
 
 namespace BookStoreWeb.Areas.Customer.Controllers;
 
@@ -141,10 +143,66 @@ public class CartController : Controller
 
         await _unitOfWork.SaveAsync();
 
-        _unitOfWork.ShoppingCartRepository.RemoveRange(model.Carts);
+
+        // ----------------
+        var domain = "http://localhost:5000/";
+        var options = new SessionCreateOptions
+        {
+            LineItems = new() {},
+            Mode = "payment",
+            SuccessUrl = domain + $"Customer/Cart/OrderConfirmation?id={order.Id}",
+            CancelUrl = domain + "Customer/Cart/Index",
+        };
+
+        foreach (var cart in model.Carts)
+        {
+            options.LineItems.Add(new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    UnitAmount = (long)cart.Price * 1000,
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = cart.Product.Title,
+                    },
+                },
+                Quantity = cart.Count,
+            });
+        }
+
+        var service = new SessionService();
+        var session = await service.CreateAsync(options);
+        await _unitOfWork.OrderRepository.UpdateStripePayment(order.Id, session.Id, session.PaymentIntentId);
+        await _unitOfWork.SaveAsync();
+        Response.Headers.Add("Location", session.Url);
+        return new StatusCodeResult(303);
+    }
+
+    public async Task<IActionResult> OrderConfirmation(int id)
+    {
+        var order = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == id);
+
+        if (order is null) return NotFound();
+
+        var service = new SessionService();
+        var session = await service.GetAsync(order.SessionId);
+        // check stripe status
+        if (session.PaymentStatus.ToLower() == "paid")
+        {
+            await _unitOfWork.OrderRepository.UpdateStatus(
+                order.Id,
+                SD.StatusApproved,
+                SD.StatusApproved);
+            await _unitOfWork.SaveAsync();
+        }
+
+        var carts = await _unitOfWork.ShoppingCartRepository
+                            .GetAllAsync(c => c.ApplicationUserId == order.ApplicationUserId);
+        _unitOfWork.ShoppingCartRepository.RemoveRange(carts);
         await _unitOfWork.SaveAsync();
 
-        return RedirectToAction("Index", "Home");
+        return View(id);
     }
 
     #region API

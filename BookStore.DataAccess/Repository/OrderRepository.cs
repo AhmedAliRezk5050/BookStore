@@ -41,6 +41,19 @@ namespace BookStore.DataAccess.Repository
                 dbSet.Update(orderFromDb);
             }
         }
+        
+        public async Task  UpdateStripePayment(int id, string sessionId, string paymentIntentId)
+        {
+            var orderFromDb = await _context.Orders
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (orderFromDb is not null)
+            {
+                orderFromDb.SessionId = sessionId;
+                orderFromDb.PaymentIntentId = paymentIntentId;
+                dbSet.Update(orderFromDb);
+            }
+        }
 
         protected virtual void Dispose(bool disposing)
         {
