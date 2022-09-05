@@ -4,6 +4,7 @@ using BookStore.Models;
 using BookStore.Models.ViewModels;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using Stripe.Checkout;
@@ -15,12 +16,13 @@ namespace BookStoreWeb.Areas.Customer.Controllers;
 public class CartController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
-
+    private readonly UserManager<IdentityUser> _userManager;
     public CartViewModel CartViewModel { get; set; } = new();
 
-    public CartController(IUnitOfWork unitOfWork)
+    public CartController(IUnitOfWork unitOfWork, UserManager<IdentityUser> userManager)
     {
         _unitOfWork = unitOfWork;
+        _userManager = userManager;
     }
 
     public async Task<IActionResult> Index()
@@ -111,6 +113,11 @@ public class CartController : Controller
             return View(model);
         }
 
+        var user = await _unitOfWork.ApplicationUserRepository
+            .GetFirstOrDefaultAsync(u => u.Id == currentUserId);
+
+        var isCompanyUser = await IsCompanyUser(user!);
+
         var order = new Order()
         {
             ApplicationUserId = currentUserId,
@@ -121,8 +128,8 @@ public class CartController : Controller
             State = model.State,
             PostalCode = model.PostalCode,
             OrderTotal = model.TotalPrice,
-            PaymentStatus = SD.StatusPending,
-            OrderStatus = SD.StatusPending,
+            PaymentStatus = isCompanyUser ? SD.PaymentStatusDelayedPayment : SD.StatusPending,
+            OrderStatus = isCompanyUser ? SD.StatusApproved : SD.StatusPending,
             OrderDate = DateTime.Now
         };
 
@@ -142,13 +149,24 @@ public class CartController : Controller
         }
 
         await _unitOfWork.SaveAsync();
+        // ----------------
+        // ----------------
+        // ----------------
 
+        // -------If company user ---------
+        if (isCompanyUser)
+        {
+            return RedirectToAction(nameof(OrderConfirmation), new { id = order.Id });
+        }
+        // ----------------
 
+        // ----------------
+        // ----------------
         // ----------------
         var domain = "http://localhost:5000/";
         var options = new SessionCreateOptions
         {
-            LineItems = new() {},
+            LineItems = new() { },
             Mode = "payment",
             SuccessUrl = domain + $"Customer/Cart/OrderConfirmation?id={order.Id}",
             CancelUrl = domain + "Customer/Cart/Index",
@@ -185,25 +203,31 @@ public class CartController : Controller
 
         if (order is null) return NotFound();
 
-        var service = new SessionService();
-        var session = await service.GetAsync(order.SessionId);
-        // check stripe status
-        if (session.PaymentStatus.ToLower() == "paid")
+        if (order.PaymentStatus != SD.PaymentStatusDelayedPayment)
         {
-            await _unitOfWork.OrderRepository.UpdateStatus(
-                order.Id,
-                SD.StatusApproved,
-                SD.StatusApproved);
-            await _unitOfWork.SaveAsync();
+            var service = new SessionService();
+            var session = await service.GetAsync(order.SessionId);
+
+            // check stripe status
+            if (session.PaymentStatus.ToLower() == "paid")
+            {
+                await _unitOfWork.OrderRepository.UpdateStatus(
+                    order.Id,
+                    SD.StatusApproved,
+                    SD.StatusApproved);
+                await _unitOfWork.SaveAsync();
+            }
         }
 
         var carts = await _unitOfWork.ShoppingCartRepository
-                            .GetAllAsync(c => c.ApplicationUserId == order.ApplicationUserId);
+            .GetAllAsync(c => c.ApplicationUserId == order.ApplicationUserId);
         _unitOfWork.ShoppingCartRepository.RemoveRange(carts);
         await _unitOfWork.SaveAsync();
 
         return View(id);
     }
+
+    public Task<bool> IsCompanyUser(ApplicationUser user) => _userManager.IsInRoleAsync(user, SD.CompanyUserRole);
 
     #region API
 
