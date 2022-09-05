@@ -4,6 +4,7 @@ using BookStore.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using BookStore.Utility;
 using Stripe;
 
@@ -28,7 +29,11 @@ public class Program
 
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddControllersWithViews().AddJsonOptions(options => 
+        { 
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.WriteIndented = true;
+        });
 
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
             {

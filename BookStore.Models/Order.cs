@@ -41,6 +41,6 @@ public class Order
     public string? SessionId { get; set; }
     
     public string? PaymentIntentId { get; set; }
-    
-    
+
+    public ICollection<OrderDetail> OrderDetails { get; set; } = null!;
 }

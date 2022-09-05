@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Orders";
+}
+
+<div class="row pt-4 mb-5">
+    <div class="col-6">
+        <h2 class="text-primary">Orders List</h2>
+    </div>
+</div>
+
+<div class="row">
+    <table id="tblData" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Emaill</th>
+            <th>Order Status</th>
+            <th>Order Total</th>
+            <th></th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/order.js"></script>
+}
