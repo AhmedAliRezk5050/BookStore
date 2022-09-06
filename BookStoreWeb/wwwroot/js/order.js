@@ -1,6 +1,15 @@
 ﻿let dataTable;
 
 $(document).ready(function () {
+    $(".filter-btn").click(function() {
+        const status = $(this).data("status");
+        const btn = $(this);
+        $(".filter-btn")
+        btn.siblings().removeClass("active");
+        btn.addClass("active");
+        $('#tblData').DataTable().search(status === "all" ? "" : status).draw();
+    });
+    
     loadDataTable();
 });
 

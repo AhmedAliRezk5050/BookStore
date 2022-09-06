@@ -1,4 +1,5 @@
-﻿using BookStore.DataAccess.Repository.IRepository;
+﻿using System.Collections;
+using BookStore.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreWeb.Areas.Admin.Controllers;
@@ -13,7 +14,7 @@ public class OrderController : Controller
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<IActionResult> Index()
+    public IActionResult Index(string? status)
     {
         return View();
     }
