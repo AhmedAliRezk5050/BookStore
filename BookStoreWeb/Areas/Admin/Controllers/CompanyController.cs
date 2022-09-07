@@ -8,12 +8,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Hosting;
 using NuGet.Packaging;
 using AutoMapper;
+using BookStore.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Bson;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BookStoreWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.AdminRole)]
     public class CompanyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

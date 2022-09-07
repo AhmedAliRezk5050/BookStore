@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Hosting;
 using NuGet.Packaging;
 using AutoMapper;
+using BookStore.Utility;
 using Newtonsoft.Json.Bson;
-
+using Microsoft.AspNetCore.Authorization;
 namespace BookStoreWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.AdminRole)]
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
