@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using BookStore.Utility;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Stripe;
 
 namespace BookStoreWeb;
@@ -36,9 +37,9 @@ public class Program
         });
 
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-            {
-                //options.SignIn.RequireConfirmedAccount = true
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+        }).AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
 
        
 
@@ -46,7 +47,10 @@ public class Program
         {
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         }
-
+        
+        builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+        builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+        
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
