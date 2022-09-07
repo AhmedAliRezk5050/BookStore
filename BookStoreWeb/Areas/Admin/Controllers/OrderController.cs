@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using BookStore.DataAccess.Repository.IRepository;
 using BookStore.Models;
+using BookStore.Models.ViewModels;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,112 @@ public class OrderController : Controller
     public IActionResult Index(string? status)
     {
         return View();
+    }
+    
+    public async Task<IActionResult> Details(int id)
+    {
+        var order = await _unitOfWork.OrderRepository.
+            GetFirstOrDefaultAsync(o => o.Id == id, "ApplicationUser");
+        if (order == null) return NotFound();
+        var orderDetails = await GetOrderDetails(order.Id);
+        var orderDetailsViewModel = new OrderDetailsViewModel()
+        {
+            IsAdminOrEmployee =  User.IsInRole(SD.AdminRole) ||  User.IsInRole(SD.EmployeeRole),
+            Id = order.Id,
+            Name = order.Name,
+            PhoneNumber = order.PhoneNumber,
+            StreetAddress = order.StreetAddress,
+            City = order.City,
+            State = order.State,
+            PostalCode = order.PostalCode,
+            Email = order.ApplicationUser.Email,
+            OrderTotal = order.OrderTotal,
+            OrderDate = order.OrderDate,
+            Carrier = order.Carrier,
+            TrackingNumber = order.TrackingNumber,
+            ShippingDate = order.ShippingDate,
+            PaymentDate = order.PaymentDate,
+            PaymentDueDate = order.PaymentDueDate,
+            SessionId = order.SessionId,
+            PaymentIntentId = order.PaymentIntentId,
+            PaymentStatus = order.PaymentStatus,
+            OrderStatus = order.OrderStatus,
+            OrderDetails = orderDetails,
+        };
+        
+        
+        return View(orderDetailsViewModel);
+    }
+    
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateOrderDetail(OrderDetailsViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            model.OrderDetails =  await GetOrderDetails(model.Id);
+            return View(nameof(Details), model);
+        }
+
+        var orderFromDb = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == model.Id);
+        if (orderFromDb is null) return NotFound();
+
+        orderFromDb.Name = model.Name;
+        orderFromDb.PhoneNumber = model.PhoneNumber;
+        orderFromDb.StreetAddress = model.StreetAddress;
+        orderFromDb.City = model.City;
+        orderFromDb.State = model.State;
+        orderFromDb.PostalCode = model.PostalCode;
+        orderFromDb.Carrier = model.Carrier;
+        orderFromDb.TrackingNumber = model.TrackingNumber;
+        
+        _unitOfWork.OrderRepository.Update(orderFromDb);
+        await _unitOfWork.SaveAsync();
+        TempData["success"] = "Order details updated successfully";
+        return RedirectToAction(nameof(Details), new { id = orderFromDb.Id });
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> StartProcessing(OrderDetailsViewModel model)
+    {
+        await _unitOfWork.OrderRepository.UpdateStatus(SD.StatusInProcess, id: model.Id);
+        await _unitOfWork.SaveAsync();
+        TempData["success"] = "Order status updated successfully";
+        return RedirectToAction(nameof(Details), new { id = model.Id });
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ShipOrder(OrderDetailsViewModel model)
+    {
+        if (model.TrackingNumber == null ||  model.Carrier == null)
+        {
+
+            if (model.TrackingNumber == null)
+            {
+                ModelState.AddModelError("TrackingNumber", "TrackingNumber is required");
+            }
+            if (model.Carrier == null)
+            {
+                ModelState.AddModelError("Carrier", "Carrier is required");
+            }
+            model.OrderDetails =  await GetOrderDetails(model.Id);
+            return View(nameof(Details), model);
+        }
+        
+        var orderFromDb = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == model.Id);
+        if (orderFromDb is null) return NotFound();
+        
+        orderFromDb.TrackingNumber = model.TrackingNumber;
+        orderFromDb.Carrier = model.Carrier;
+        orderFromDb.OrderStatus = SD.StatusShipped;
+        orderFromDb.ShippingDate = DateTime.Now;
+        _unitOfWork.OrderRepository.Update(orderFromDb);
+        await _unitOfWork.SaveAsync();
+        TempData["success"] = "Order status updated successfully";
+        return RedirectToAction(nameof(Details), new { id = model.Id });
     }
 
     #region API
@@ -46,4 +153,8 @@ public class OrderController : Controller
     }
 
     #endregion
+
+
+    private Task<List<OrderDetail>> GetOrderDetails(int orderId) => _unitOfWork.OrderDetailRepository
+            .GetAllAsync(o => o.OrderId == orderId, "Product");
 }

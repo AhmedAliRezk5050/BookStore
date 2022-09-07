@@ -12,4 +12,8 @@
       <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.8" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BookStore.Utility\BookStore.Utility.csproj" />
+    </ItemGroup>
+
 </Project>

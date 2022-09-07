@@ -191,7 +191,7 @@ public class CartController : Controller
 
         var service = new SessionService();
         var session = await service.CreateAsync(options);
-        await _unitOfWork.OrderRepository.UpdateStripePayment(order.Id, session.Id, session.PaymentIntentId);
+        _unitOfWork.OrderRepository.UpdateStripePayment(order, session.Id, session.PaymentIntentId);
         await _unitOfWork.SaveAsync();
         Response.Headers.Add("Location", session.Url);
         return new StatusCodeResult(303);
@@ -212,9 +212,7 @@ public class CartController : Controller
             if (session.PaymentStatus.ToLower() == "paid")
             {
                 await _unitOfWork.OrderRepository.UpdateStatus(
-                    order.Id,
-                    SD.StatusApproved,
-                    SD.StatusApproved);
+                    SD.StatusApproved, paymentStatus: SD.StatusApproved,  order: order );
                 await _unitOfWork.SaveAsync();
             }
         }

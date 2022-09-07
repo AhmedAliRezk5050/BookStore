@@ -1,0 +1,299 @@
+﻿@using BookStore.Utility
+@model OrderDetailsViewModel
+
+<form method="post">
+<input asp-for="Id" hidden/>
+<br/>
+<div class="container">
+<div class="card">
+<div class="card-header bg-dark text-light ml-0">
+    <div class="container row">
+        <div class="col-12 d-none d-md-block col-md-6 pb-1">
+            <i class="fas fa-shopping-cart"></i> &nbsp; Order Summary
+        </div>
+        <div class="col-12 col-md-4 offset-md-2 text-right">
+            <a asp-action="Index" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+        </div>
+    </div>
+</div>
+<div class="card-body">
+<div class="container rounded p-2">
+<div class="row">
+<div class="col-12 col-lg-6 pb-4">
+    <div class="row">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-primary">PickUp Details:</span>
+        </h4>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Name</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="Name" type="text" class="form-control"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            }
+            else
+            {
+                <input asp-for="Name" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Phone</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="PhoneNumber" type="text" class="form-control"/>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            }
+            else
+            {
+                <input asp-for="PhoneNumber" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Address</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="StreetAddress" type="text" class="form-control"/>
+                <span asp-validation-for="StreetAddress" class="text-danger"></span>
+            }
+            else
+            {
+                <input asp-for="StreetAddress" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">City</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="City" type="text" class="form-control"/>
+                <span asp-validation-for="City" class="text-danger"></span>
+            }
+            else
+            {
+                <input asp-for="City" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">State</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="State" type="text" class="form-control"/>
+                <span asp-validation-for="State" class="text-danger"></span>
+            }
+            else
+            {
+                <input asp-for="State" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Zip Code</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="PostalCode" type="text" class="form-control"/>
+                <span asp-validation-for="PostalCode" class="text-danger"></span>
+            }
+            else
+            {
+                <input asp-for="PostalCode" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Email</div>
+        <div class="col-9">
+            <input asp-for="Email" readonly type="text" class="form-control"/>
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Order Date</div>
+        <div class="col-9">
+
+            <input value="@Model.OrderDate.ToShortDateString()" readonly type="text" class="form-control"/>
+
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Carrier</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="Carrier" id="carrier" type="text" class="form-control"/>
+                <span asp-validation-for="Carrier"></span>
+            }
+            else
+            {
+                <input asp-for="Carrier" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Tracking</div>
+        <div class="col-9">
+            @if (Model.IsAdminOrEmployee)
+            {
+                <input asp-for="TrackingNumber" id="trackingNumber" type="text" class="form-control"/>
+                <span asp-validation-for="TrackingNumber"></span>
+            }
+            else
+            {
+                <input asp-for="TrackingNumber" readonly type="text" class="form-control"/>
+            }
+        </div>
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Shipping Date</div>
+        <div class="col-9">
+            <input value="@Model.ShippingDate" type="text" readonly class="form-control"/>
+        </div>
+    </div>
+    @if (Model.IsAdminOrEmployee)
+    {
+        <div class="row my-1">
+            <div class="col-3">Session ID</div>
+            <div class="col-9">
+                <input asp-for="SessionId" type="text" readonly class="form-control"/>
+            </div>
+        </div>
+        <div class="row my-1">
+            <div class="col-3">Payment Intent ID</div>
+            <div class="col-9">
+                <input asp-for="PaymentIntentId" type="text" readonly class="form-control"/>
+            </div>
+        </div>
+    }
+    <div class="row my-1">
+        @if (Model.SessionId == null)
+        {
+            // if payment is not done
+            <div class="col-3">Payment Due Date</div>
+            <div class="col-9">
+                <input value="@Model.PaymentDueDate.ToShortDateString()"
+                       readonly type="text" class="form-control"/>
+            </div>
+        }
+        else
+        {
+            // if payment is  done
+            <div class="col-3">Payment Date</div>
+            <div class="col-9">
+                <input value="@Model.PaymentDate.ToShortDateString()"
+                       readonly id="paymentDate" type="text" class="form-control"/>
+            </div>
+        }
+    </div>
+    <div class="row my-1">
+        <div class="col-3">Payment Status</div>
+        <div class="col-9">
+            <input asp-for="PaymentStatus" type="text" readonly class="form-control"/>
+        </div>
+    </div>
+    <input type="submit" asp-action="UpdateOrderDetail" class="btn btn-warning form-control my-1" value="Update Order Details"/>
+
+
+</div>
+<div class="col-12 col-lg-5 offset-lg-1">
+    <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-primary">Order Summary</span>
+    </h4>
+    <label class="btn btn-outline-primary form-control my-2">Order Status - @Model.OrderStatus</label>
+    <input hidden asp-for="OrderStatus"/>
+    <input hidden asp-for="IsAdminOrEmployee"/>
+    <ul class="list-group mb-3">
+        @foreach (var detail in Model.OrderDetails ?? Array.Empty<OrderDetail>())
+        {
+            <li class="list-group-item d-flex justify-content-between p-2">
+                <div class="row container">
+                    <div class="col-8">
+
+                        <h6 class="my-0 text-primary">@detail.Product.Title</h6>
+                        <small class="text-muted">Price : @detail.Price.ToString("c")</small><br/>
+                        <small class="text-muted">Quantity : @detail.Quantity</small>
+                    </div>
+                    <div class="col-4 text-end">
+                        <p class="text-success">@((detail.Quantity * detail.Price).ToString("c"))</p>
+                    </div>
+                </div>
+            </li>
+        }
+        <li class="list-group-item bg-info">
+            <div class="row container">
+                <div class="col-6">
+                    <h5 class="text-white">TOTAL </h5>
+                </div>
+                <div class="col-6 text-end">
+                    <h5 class="text-white">@Model.OrderTotal.ToString("c")</h5>
+                </div>
+            </div>
+        </li>
+    </ul>
+    @if (Model.PaymentStatus == SD.PaymentStatusDelayedPayment &&
+         Model.OrderStatus == SD.StatusShipped)
+    {
+        <input type="submit" class="btn btn-success form-control my-1" value="Pay Now"/>
+    }
+    @if (Model.IsAdminOrEmployee)
+    {
+        switch (Model.OrderStatus)
+        {
+            case SD.StatusApproved:
+                <input type="submit" asp-action="StartProcessing" class="btn btn-primary form-control my-1" value="Start Processing"/>
+                break;
+            case SD.StatusInProcess:
+                <input type="submit"
+                       onclick="return validateInput()"
+                       asp-action="ShipOrder" class="btn btn-primary form-control my-1" value="Ship Order"/>
+                break;
+        }
+
+        @if (Model.OrderStatus != SD.StatusRefunded &&
+             Model.OrderStatus != SD.StatusCancelled &&
+             Model.OrderStatus != SD.StatusShipped)
+        {
+            <input type="submit" asp-action="CancelOrder" class="btn btn-danger form-control my-1" value="Cancel Order"/>
+        }
+    }
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</form>
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial"/>
+    <script>
+	function validateInput(){
+		if(document.getElementById("trackingNumber").value===""){
+			Swal.fire({
+			  icon: 'error',
+			  title: 'Oops...',
+			  text: 'Please enter tracking number!',
+			});
+			return false;
+		}
+		if(document.getElementById("carrier").value===""){
+			Swal.fire({
+			  icon: 'error',
+			  title: 'Oops...',
+			  text: 'Please enter carrier!',
+			});
+			return false;
+		}
+		return true;
+	}
+</script>
+
+}

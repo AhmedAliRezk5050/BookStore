@@ -26,33 +26,32 @@ namespace BookStore.DataAccess.Repository
             dbSet.Update(order);
         }
 
-        public async Task  UpdateStatus(int id, string orderStatus, string? paymentStatus = null)
+        public async Task UpdateStatus(string orderStatus, int? id = null, Order? order = null, string? paymentStatus = null)
         {
-            var orderFromDb = await _context.Orders
-                .FirstOrDefaultAsync(o => o.Id == id);
-
-            if (orderFromDb is not null)
+            Order? toUpdateOrder = null;
+            
+            if (order is null)
             {
-                orderFromDb.OrderStatus = orderStatus;
-                if (paymentStatus is not null)
-                {
-                    orderFromDb.PaymentStatus = paymentStatus;
-                }
-                dbSet.Update(orderFromDb);
+                 toUpdateOrder = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
             }
+            else
+            {
+                toUpdateOrder = order;
+            }
+
+            if (toUpdateOrder is null) return;
+            
+            toUpdateOrder.OrderStatus = orderStatus;
+            toUpdateOrder.PaymentStatus = paymentStatus;
+            dbSet.Update(toUpdateOrder);
         }
-        
-        public async Task  UpdateStripePayment(int id, string sessionId, string paymentIntentId)
-        {
-            var orderFromDb = await _context.Orders
-                .FirstOrDefaultAsync(o => o.Id == id);
 
-            if (orderFromDb is not null)
-            {
-                orderFromDb.SessionId = sessionId;
-                orderFromDb.PaymentIntentId = paymentIntentId;
-                dbSet.Update(orderFromDb);
-            }
+        public void  UpdateStripePayment(Order order, string sessionId, string paymentIntentId)
+        {
+            order.PaymentDate = DateTime.Now;
+            order.SessionId = sessionId;
+            order.PaymentIntentId = paymentIntentId;
+            dbSet.Update(order);
         }
 
         protected virtual void Dispose(bool disposing)
