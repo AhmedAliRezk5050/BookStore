@@ -240,7 +240,7 @@
     @if (Model.PaymentStatus == SD.PaymentStatusDelayedPayment &&
          Model.OrderStatus == SD.StatusShipped)
     {
-        <input type="submit" class="btn btn-success form-control my-1" value="Pay Now"/>
+        <input type="submit" class="btn btn-success form-control my-1"  asp-action="DelayedPay" asp-route-orderId="@Model.Id" value="Pay Now"/>
     }
     @if (Model.IsAdminOrEmployee)
     {

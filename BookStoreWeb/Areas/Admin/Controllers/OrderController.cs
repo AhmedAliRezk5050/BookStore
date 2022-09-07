@@ -6,6 +6,8 @@ using BookStore.Models.ViewModels;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
+using Stripe.Checkout;
 
 namespace BookStoreWeb.Areas.Admin.Controllers;
 
@@ -24,16 +26,15 @@ public class OrderController : Controller
     {
         return View();
     }
-    
+
     public async Task<IActionResult> Details(int id)
     {
-        var order = await _unitOfWork.OrderRepository.
-            GetFirstOrDefaultAsync(o => o.Id == id, "ApplicationUser");
+        var order = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == id, "ApplicationUser");
         if (order == null) return NotFound();
         var orderDetails = await GetOrderDetails(order.Id);
         var orderDetailsViewModel = new OrderDetailsViewModel()
         {
-            IsAdminOrEmployee =  User.IsInRole(SD.AdminRole) ||  User.IsInRole(SD.EmployeeRole),
+            IsAdminOrEmployee = User.IsInRole(SD.AdminRole) || User.IsInRole(SD.EmployeeRole),
             Id = order.Id,
             Name = order.Name,
             PhoneNumber = order.PhoneNumber,
@@ -55,19 +56,19 @@ public class OrderController : Controller
             OrderStatus = order.OrderStatus,
             OrderDetails = orderDetails,
         };
-        
-        
+
         return View(orderDetailsViewModel);
     }
-    
+
 
     [HttpPost]
+    [Authorize(Roles = SD.AdminRole + "," + SD.EmployeeRole)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateOrderDetail(OrderDetailsViewModel model)
     {
         if (!ModelState.IsValid)
         {
-            model.OrderDetails =  await GetOrderDetails(model.Id);
+            model.OrderDetails = await GetOrderDetails(model.Id);
             return View(nameof(Details), model);
         }
 
@@ -82,14 +83,15 @@ public class OrderController : Controller
         orderFromDb.PostalCode = model.PostalCode;
         orderFromDb.Carrier = model.Carrier;
         orderFromDb.TrackingNumber = model.TrackingNumber;
-        
+
         _unitOfWork.OrderRepository.Update(orderFromDb);
         await _unitOfWork.SaveAsync();
         TempData["success"] = "Order details updated successfully";
         return RedirectToAction(nameof(Details), new { id = orderFromDb.Id });
     }
-    
+
     [HttpPost]
+    [Authorize(Roles = SD.AdminRole + "," + SD.EmployeeRole)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> StartProcessing(OrderDetailsViewModel model)
     {
@@ -98,37 +100,148 @@ public class OrderController : Controller
         TempData["success"] = "Order status updated successfully";
         return RedirectToAction(nameof(Details), new { id = model.Id });
     }
-    
+
     [HttpPost]
+    [Authorize(Roles = SD.AdminRole + "," + SD.EmployeeRole)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ShipOrder(OrderDetailsViewModel model)
     {
-        if (model.TrackingNumber == null ||  model.Carrier == null)
+        if (model.TrackingNumber == null || model.Carrier == null)
         {
-
             if (model.TrackingNumber == null)
             {
                 ModelState.AddModelError("TrackingNumber", "TrackingNumber is required");
             }
+
             if (model.Carrier == null)
             {
                 ModelState.AddModelError("Carrier", "Carrier is required");
             }
-            model.OrderDetails =  await GetOrderDetails(model.Id);
+
+            model.OrderDetails = await GetOrderDetails(model.Id);
             return View(nameof(Details), model);
         }
-        
+
         var orderFromDb = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == model.Id);
         if (orderFromDb is null) return NotFound();
-        
+
         orderFromDb.TrackingNumber = model.TrackingNumber;
         orderFromDb.Carrier = model.Carrier;
         orderFromDb.OrderStatus = SD.StatusShipped;
         orderFromDb.ShippingDate = DateTime.Now;
+        if (orderFromDb.PaymentStatus == SD.PaymentStatusDelayedPayment)
+        {
+            orderFromDb.PaymentDueDate = DateTime.Now.AddDays(30);
+        }
+
         _unitOfWork.OrderRepository.Update(orderFromDb);
         await _unitOfWork.SaveAsync();
         TempData["success"] = "Order status updated successfully";
         return RedirectToAction(nameof(Details), new { id = model.Id });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = SD.AdminRole + "," + SD.EmployeeRole)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CancelOrder(OrderDetailsViewModel model)
+    {
+        var orderFromDb = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == model.Id);
+        if (orderFromDb is null) return NotFound();
+
+
+        if (orderFromDb.PaymentStatus == SD.StatusApproved)
+        {
+            // -------- refund --------
+            var options = new RefundCreateOptions()
+            {
+                Reason = RefundReasons.RequestedByCustomer,
+                PaymentIntent = model.PaymentIntentId
+            };
+
+            var service = new RefundService();
+            var refund = await service.CreateAsync(options);
+            await _unitOfWork.OrderRepository.UpdateStatus(
+                orderStatus: SD.StatusCancelled,
+                paymentStatus: SD.StatusRefunded,
+                order: orderFromDb
+            );
+        }
+        else
+        {
+            await _unitOfWork.OrderRepository.UpdateStatus(
+                orderStatus: SD.StatusCancelled,
+                paymentStatus: SD.StatusCancelled,
+                order: orderFromDb
+            );
+        }
+
+        await _unitOfWork.SaveAsync();
+        TempData["success"] = "Order cancelled successfully";
+        return RedirectToAction(nameof(Details), new { id = model.Id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DelayedPay(int orderId)
+    {
+        var order = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == orderId, "ApplicationUser");
+        if (order == null) return NotFound();
+        var orderDetails = await GetOrderDetails(order.Id);
+        var domain = "http://localhost:5000/";
+        var options = new SessionCreateOptions
+        {
+            LineItems = new() { },
+            Mode = "payment",
+            SuccessUrl = domain + $"admin/order/PaymentConfirmation?id={orderId}",
+            CancelUrl = domain + $"admin/order/details?id={orderId}",
+        };
+
+        foreach (var orderDetail in orderDetails)
+        {
+            options.LineItems.Add(new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    UnitAmount = (long)orderDetail.Price * 1000,
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = orderDetail.Product.Title,
+                    },
+                },
+                Quantity = orderDetail.Quantity,
+            });
+        }
+
+        var service = new SessionService();
+        var session = await service.CreateAsync(options);
+        _unitOfWork.OrderRepository.UpdateStripePayment(order, session.Id, session.PaymentIntentId);
+        await _unitOfWork.SaveAsync();
+        Response.Headers.Add("Location", session.Url);
+        return new StatusCodeResult(303);
+    }
+
+    public async Task<IActionResult> PaymentConfirmation(int id)
+    {
+        var order = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == id);
+
+        if (order is null) return NotFound();
+
+        if (order.PaymentStatus == SD.PaymentStatusDelayedPayment)
+        {
+            var service = new SessionService();
+            var session = await service.GetAsync(order.SessionId);
+
+            // check stripe status
+            if (session.PaymentStatus.ToLower() == "paid")
+            {
+                await _unitOfWork.OrderRepository.UpdateStatus(
+                    orderStatus: order.OrderStatus ?? SD.StatusApproved, paymentStatus: SD.StatusApproved,
+                    order: order);
+                await _unitOfWork.SaveAsync();
+            }
+        }
+        return View(id);
     }
 
     #region API
@@ -144,8 +257,8 @@ public class OrderController : Controller
         {
             var userClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             var currentUserId = userClaim!.Value;
-            orders = await _unitOfWork.OrderRepository.
-                GetAllAsync(o => o.ApplicationUserId == currentUserId, includedProperties: "ApplicationUser");
+            orders = await _unitOfWork.OrderRepository.GetAllAsync(o => o.ApplicationUserId == currentUserId,
+                includedProperties: "ApplicationUser");
         }
 
 
@@ -154,7 +267,6 @@ public class OrderController : Controller
 
     #endregion
 
-
     private Task<List<OrderDetail>> GetOrderDetails(int orderId) => _unitOfWork.OrderDetailRepository
-            .GetAllAsync(o => o.OrderId == orderId, "Product");
+        .GetAllAsync(o => o.OrderId == orderId, "Product");
 }

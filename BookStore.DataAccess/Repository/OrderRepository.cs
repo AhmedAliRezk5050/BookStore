@@ -42,7 +42,10 @@ namespace BookStore.DataAccess.Repository
             if (toUpdateOrder is null) return;
             
             toUpdateOrder.OrderStatus = orderStatus;
-            toUpdateOrder.PaymentStatus = paymentStatus;
+            if (paymentStatus != null)
+            {
+                toUpdateOrder.PaymentStatus = paymentStatus;
+            }
             dbSet.Update(toUpdateOrder);
         }
 
