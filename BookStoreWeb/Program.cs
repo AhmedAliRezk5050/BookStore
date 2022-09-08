@@ -38,7 +38,7 @@ public class Program
 
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         {
-            options.SignIn.RequireConfirmedAccount = true;
+            // options.SignIn.RequireConfirmedAccount = true;
         }).AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
 
        
@@ -49,8 +49,7 @@ public class Program
         }
         
         // builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
-        builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
-        builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+        // builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
         
         var app = builder.Build();
 
