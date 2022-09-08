@@ -1,4 +1,5 @@
 ﻿@using BookStore.Utility
+@inject IHttpContextAccessor HttpContextAccessor 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,13 +51,16 @@
                             </div>
                         </li>
                     }
-
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           asp-area="Customer" asp-controller="Cart" asp-action="Index">
-                            <i class="bi bi-cart-fill"></i>
-                        </a>
-                    </li>
+                    @{
+                        var count = HttpContextAccessor.HttpContext?.Session.GetInt32(SD.ShoppingCartCount);
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-area="Customer" asp-controller="Cart" asp-action="Index">
+                                <i class="bi bi-cart-fill"></i> &nbsp; (@(count ?? 0))
+                            </a>
+                        </li>
+                    }
+                   
                 </ul>
                 <partial name="_LoginPartial"/>
             </div>

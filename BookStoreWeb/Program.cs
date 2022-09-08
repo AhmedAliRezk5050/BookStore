@@ -35,6 +35,15 @@ public class Program
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             options.JsonSerializerOptions.WriteIndented = true;
         });
+        
+        builder.Services.AddDistributedMemoryCache();
+        
+        builder.Services.AddSession(options =>
+        {
+            // options.IdleTimeout = TimeSpan.FromSeconds(10);
+            // options.Cookie.HttpOnly = true;
+            // options.Cookie.IsEssential = true;
+        });
 
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         {
@@ -47,10 +56,7 @@ public class Program
         {
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         }
-        
-        // builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
-        // builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
-        
+
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -72,7 +78,9 @@ public class Program
         app.UseAuthentication();
 
         app.UseAuthorization();
-
+        
+        app.UseSession();
+        
         app.MapRazorPages();
 
         app.MapControllerRoute(

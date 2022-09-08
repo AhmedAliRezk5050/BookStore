@@ -4,6 +4,7 @@ using BookStore.DataAccess.Repository.IRepository;
 using BookStore.Models;
 using BookStore.Models.ViewModels;
 using System.Security.Claims;
+using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BookStoreWeb.Areas.Customer.Controllers
@@ -65,28 +66,29 @@ namespace BookStoreWeb.Areas.Customer.Controllers
             {
                 var userClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 var currentUserId = userClaim!.Value;
-
                 //
                 var sc = await _unitOfWork.ShoppingCartRepository.GetFirstOrDefaultAsync(sc =>
                         sc.ApplicationUserId == currentUserId && sc.ProductId == product.Id);
                 if (sc is not null)
                 {
                     _unitOfWork.ShoppingCartRepository.IncrementCount(sc, model.Count ?? 0);
-                    await _unitOfWork.SaveAsync();
-                    TempData["success"] = "Product added to shopping card successfully";
-                    return RedirectToAction(nameof(Index));
                 }
-                //
-
-                var shoppingCart = new ShoppingCart()
+                else
                 {
-                    Count = model.Count ?? 1,
-                    ProductId = id,
-                    ApplicationUserId = currentUserId
-                };
-                _unitOfWork.ShoppingCartRepository.Add(shoppingCart);
+                    var shoppingCart = new ShoppingCart()
+                    {
+                        Count = model.Count ?? 1,
+                        ProductId = id,
+                        ApplicationUserId = currentUserId
+                    };
+                    _unitOfWork.ShoppingCartRepository.Add(shoppingCart);
+                }
+                
                 await _unitOfWork.SaveAsync();
                 TempData["success"] = "Product added to shopping card successfully";
+                HttpContext.Session.SetInt32(SD.ShoppingCartCount, 
+                    (await _unitOfWork.ShoppingCartRepository
+                        .GetAllAsync()).ToList().Count);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception e)

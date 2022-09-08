@@ -212,7 +212,7 @@ public class CartController : Controller
             if (session.PaymentStatus.ToLower() == "paid")
             {
                 await _unitOfWork.OrderRepository.UpdateStatus(
-                    SD.StatusApproved, paymentStatus: SD.StatusApproved,  order: order );
+                    SD.StatusApproved, paymentStatus: SD.StatusApproved, order: order);
                 await _unitOfWork.SaveAsync();
             }
         }
@@ -252,6 +252,7 @@ public class CartController : Controller
         if (cart.Count == 0)
         {
             _unitOfWork.ShoppingCartRepository.Remove(cart);
+            UpdateSession(-1);
         }
 
         await _unitOfWork.SaveAsync();
@@ -275,9 +276,21 @@ public class CartController : Controller
 
         _unitOfWork.ShoppingCartRepository.Remove(cart);
         await _unitOfWork.SaveAsync();
-
+        UpdateSession(-1);
         return Ok(new { count = cart.Count });
     }
 
     #endregion
+
+    private void UpdateSession(int i)
+    {
+        var shoppingCartCount = HttpContext.Session.GetInt32(SD.ShoppingCartCount) ?? 0;
+        switch (i)
+        {
+            case < 0 when shoppingCartCount != 0:
+            case > 0:
+                HttpContext.Session.SetInt32(SD.ShoppingCartCount, shoppingCartCount + i);
+                break;
+        }
+    }
 }
