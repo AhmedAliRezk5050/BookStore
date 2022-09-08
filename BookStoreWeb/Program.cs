@@ -48,7 +48,8 @@ public class Program
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         }
         
-        builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+        // builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+        builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
         
         var app = builder.Build();
