@@ -120,6 +120,8 @@
                     $(`#count-${id}`).text(count);
                 } else {
                     $(`#count-${id}`).closest(`#count-row-${id}`).remove();
+                    let cartCounter = $("#cart-counter");
+                    cartCounter.text(+cartCounter.text() - 1);
                     }
             },
             error: function () {
@@ -137,7 +139,9 @@
                  const totalPriceElem = $("#total-price");
                  let totalPrice = +totalPriceElem.text().replace(/[$,]/g, '');
                  totalPrice -= count*price;
-                 totalPriceElem.text(`$${totalPrice.toFixed(2)}`); 
+                 totalPriceElem.text(`$${totalPrice.toFixed(2)}`);
+                  let cartCounter = $("#cart-counter");
+                    cartCounter.text(+cartCounter.text() - 1);
             },
             error: function () {
                   alert("error");

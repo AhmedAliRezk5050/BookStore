@@ -221,7 +221,7 @@ public class CartController : Controller
             .GetAllAsync(c => c.ApplicationUserId == order.ApplicationUserId);
         _unitOfWork.ShoppingCartRepository.RemoveRange(carts);
         await _unitOfWork.SaveAsync();
-
+        HttpContext.Session.Clear();
         return View(id);
     }
 
@@ -252,7 +252,7 @@ public class CartController : Controller
         if (cart.Count == 0)
         {
             _unitOfWork.ShoppingCartRepository.Remove(cart);
-            UpdateSession(-1);
+            DecrementCartSession();
         }
 
         await _unitOfWork.SaveAsync();
@@ -276,21 +276,18 @@ public class CartController : Controller
 
         _unitOfWork.ShoppingCartRepository.Remove(cart);
         await _unitOfWork.SaveAsync();
-        UpdateSession(-1);
+        DecrementCartSession();
         return Ok(new { count = cart.Count });
     }
 
     #endregion
 
-    private void UpdateSession(int i)
+    private void DecrementCartSession()
     {
         var shoppingCartCount = HttpContext.Session.GetInt32(SD.ShoppingCartCount) ?? 0;
-        switch (i)
+        if (shoppingCartCount > 0)
         {
-            case < 0 when shoppingCartCount != 0:
-            case > 0:
-                HttpContext.Session.SetInt32(SD.ShoppingCartCount, shoppingCartCount + i);
-                break;
+            HttpContext.Session.SetInt32(SD.ShoppingCartCount, shoppingCartCount - 1);
         }
     }
 }
