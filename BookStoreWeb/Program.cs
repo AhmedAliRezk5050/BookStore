@@ -29,6 +29,7 @@ public class Program
         );
 
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddScoped<IDbInitializer, DbInitializer>();
         
         builder.Services.AddControllersWithViews().AddJsonOptions(options => 
         { 
@@ -40,20 +41,19 @@ public class Program
         
         builder.Services.AddSession(options =>
         {
-            // options.IdleTimeout = TimeSpan.FromSeconds(10);
-            // options.Cookie.HttpOnly = true;
-            // options.Cookie.IsEssential = true;
+            options.IdleTimeout = TimeSpan.FromMinutes(10);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
         });
 
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         {
-            // options.SignIn.RequireConfirmedAccount = true;
         }).AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
 
         builder.Services.AddAuthentication().AddFacebook(facebookOptions =>
         {
-            facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
-            facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+            facebookOptions.AppId = builder.Configuration.GetSection("Facebook:AppId").Get<string>();
+            facebookOptions.AppSecret = builder.Configuration.GetSection("Facebook:AppSecret").Get<string>();
         });
 
         if (builder.Environment.IsDevelopment())
@@ -93,29 +93,17 @@ public class Program
             name: "default",
             pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
-        // SeedDb(app);
+        SeedDb(app).GetAwaiter().GetResult();
 
         app.Run();
     }
 
-    private static void SeedDb(WebApplication app)
+    private static async Task SeedDb(WebApplication app)
     {
         using (var scope = app.Services.CreateScope())
         {
-            var services = scope.ServiceProvider;
-
-            try
-            {
-                var context = services.GetRequiredService<DataContext>();
-
-                SeedData.SeedDatabase(context);
-            }
-            catch (Exception ex)
-            {
-                var logger = services.GetRequiredService<ILogger<Program>>();
-
-                logger.LogError(ex, "An error occurred while seeding the database.");
-            }
+            var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+            await dbInitializer.Initialize();
         }
     }
 }

@@ -128,17 +128,7 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            RolesSelectList = await _roleManager.Roles.Select(r => new SelectListItem()
-            {
-                Text = r.Name,
-                Value = r.Name
-            }).ToListAsync();
-
-            CompaniesSelectList = (await _unitOfWork.CompanyRepository.GetAllAsync()).Select(c => new SelectListItem()
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
-            });
+            await FillRolesCompanies();
 
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -210,8 +200,14 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-
+            
+            
             // If we got this far, something failed, redisplay form
+            if (User.IsInRole(SD.AdminRole))
+            {
+                await FillRolesCompanies();
+            }
+           
             return Page();
         }
 
@@ -236,6 +232,21 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
             return (IUserEmailStore<IdentityUser>)_userStore;
+        }
+
+        private async Task FillRolesCompanies()
+        {
+            RolesSelectList = await _roleManager.Roles.Select(r => new SelectListItem()
+            {
+                Text = r.Name,
+                Value = r.Name
+            }).ToListAsync();
+
+            CompaniesSelectList = (await _unitOfWork.CompanyRepository.GetAllAsync()).Select(c => new SelectListItem()
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            });
         }
     }
 }
