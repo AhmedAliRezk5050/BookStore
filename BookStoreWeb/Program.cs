@@ -50,7 +50,11 @@ public class Program
             // options.SignIn.RequireConfirmedAccount = true;
         }).AddRoles<IdentityRole>().AddEntityFrameworkStores<DataContext>();
 
-       
+        builder.Services.AddAuthentication().AddFacebook(facebookOptions =>
+        {
+            facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+            facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+        });
 
         if (builder.Environment.IsDevelopment())
         {
@@ -69,6 +73,8 @@ public class Program
             app.UseHsts();
         }
 
+        app.UseHttpsRedirection();
+        
         app.UseStaticFiles();
 
         app.UseRouting();
