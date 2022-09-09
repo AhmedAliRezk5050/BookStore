@@ -149,21 +149,13 @@ public class CartController : Controller
         }
 
         await _unitOfWork.SaveAsync();
-        // ----------------
-        // ----------------
-        // ----------------
 
         // -------If company user ---------
         if (isCompanyUser)
         {
             return RedirectToAction(nameof(OrderConfirmation), new { id = order.Id });
         }
-        // ----------------
 
-        // ----------------
-        // ----------------
-        // ----------------
-        // ----------------
         var baseUrl = string.Format("{0}://{1}",
                        HttpContext.Request.Scheme, HttpContext.Request.Host);
 
