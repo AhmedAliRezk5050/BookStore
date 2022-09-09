@@ -192,11 +192,18 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
+                    if (User.IsInRole(SD.AdminRole))
+                    {
+                        TempData["success"] = "User created successfully";
+                    }
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
                     }
+                    
+                    return LocalRedirect(returnUrl);
+
+                   
                 }
                 foreach (var error in result.Errors)
                 {

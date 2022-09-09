@@ -36,7 +36,7 @@
                             <a class="nav-link dropdown-toggle"
                                data-bs-toggle="dropdown" href="#" role="button"
                                aria-haspopup="true" aria-expanded="false">
-                                Content Management
+                                 Management
                             </a>
 
                             <div class="dropdown-menu">
@@ -46,6 +46,8 @@
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="CoverType" asp-action="Index">Cover Types</a>
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="Product" asp-action="Index">Products</a>
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="Company" asp-action="Index">Companies</a>
+                                    <a class="dropdown-item" asp-area="Identity" 
+                                      asp-page="/Account/Register">Create User</a>
                                 }
                                 <a class="dropdown-item" asp-area="Admin" asp-controller="Order" asp-action="Index">Orders</a>
                             </div>
