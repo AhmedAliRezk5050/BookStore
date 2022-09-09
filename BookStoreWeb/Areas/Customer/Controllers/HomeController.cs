@@ -6,6 +6,7 @@ using BookStore.Models.ViewModels;
 using System.Security.Claims;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace BookStoreWeb.Areas.Customer.Controllers
 {
@@ -25,7 +26,6 @@ namespace BookStoreWeb.Areas.Customer.Controllers
         {
             var products = await _unitOfWork.ProductRepository
                 .GetAllAsync(includedProperties: "Category,CoverType");
-
             return View(products);
         }
 

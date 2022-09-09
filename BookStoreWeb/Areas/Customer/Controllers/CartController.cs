@@ -163,13 +163,15 @@ public class CartController : Controller
         // ----------------
         // ----------------
         // ----------------
-        var domain = "http://localhost:5000/";
+        var baseUrl = string.Format("{0}://{1}",
+                       HttpContext.Request.Scheme, HttpContext.Request.Host);
+
         var options = new SessionCreateOptions
         {
             LineItems = new() { },
             Mode = "payment",
-            SuccessUrl = domain + $"Customer/Cart/OrderConfirmation?id={order.Id}",
-            CancelUrl = domain + "Customer/Cart/Index",
+            SuccessUrl = baseUrl + $"/Customer/Cart/OrderConfirmation?id={order.Id}",
+            CancelUrl = baseUrl + "/Customer/Cart/Index",
         };
 
         foreach (var cart in model.Carts)

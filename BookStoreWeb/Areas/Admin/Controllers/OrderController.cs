@@ -5,6 +5,7 @@ using BookStore.Models;
 using BookStore.Models.ViewModels;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using Stripe.Checkout;
@@ -187,13 +188,14 @@ public class OrderController : Controller
         var order = await _unitOfWork.OrderRepository.GetFirstOrDefaultAsync(o => o.Id == orderId, "ApplicationUser");
         if (order == null) return NotFound();
         var orderDetails = await GetOrderDetails(order.Id);
-        var domain = "http://localhost:5000/";
+        var baseUrl = string.Format("{0}://{1}",
+                      HttpContext.Request.Scheme, HttpContext.Request.Host);
         var options = new SessionCreateOptions
         {
             LineItems = new() { },
             Mode = "payment",
-            SuccessUrl = domain + $"admin/order/PaymentConfirmation?id={orderId}",
-            CancelUrl = domain + $"admin/order/details?id={orderId}",
+            SuccessUrl = baseUrl + $"/admin/order/PaymentConfirmation?id={orderId}",
+            CancelUrl = baseUrl + $"/admin/order/details?id={orderId}",
         };
 
         foreach (var orderDetail in orderDetails)
