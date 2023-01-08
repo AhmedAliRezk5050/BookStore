@@ -1,5 +1,7 @@
 ﻿@page
+@using Microsoft.Extensions.Options
 @model LoginModel
+@inject IOptions<GoogleReCaptchaSettings> GoogleRecaptcha;
 
 @{
     ViewData["Title"] = "Log in";
@@ -31,6 +33,7 @@
                         </label>
                     </div>
                 </div>
+                <div class="g-recaptcha my-3" data-sitekey="@GoogleRecaptcha.Value.ReCaptchaSiteKey"></div>
                 <div>
                     <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
                 </div>
@@ -82,4 +85,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 }

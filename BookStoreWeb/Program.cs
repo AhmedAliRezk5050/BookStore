@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using BookStore.Models;
 using BookStore.Utility;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Stripe;
@@ -55,7 +56,9 @@ public class Program
             facebookOptions.AppId = builder.Configuration.GetSection("Facebook:AppId").Get<string>();
             facebookOptions.AppSecret = builder.Configuration.GetSection("Facebook:AppSecret").Get<string>();
         });
-
+        
+        builder.Services.Configure<GoogleReCaptchaSettings>(builder.Configuration.GetSection("GoogleReCaptchaSettings"));
+        
         if (builder.Environment.IsDevelopment())
         {
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();

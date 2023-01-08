@@ -10,5 +10,13 @@
   {
     "outputFile": "wwwroot/css/site.css",
     "inputFile": "wwwroot/css/site.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/_bootswatch.css",
+    "inputFile": "wwwroot/css/_bootswatch.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/_variables.css",
+    "inputFile": "wwwroot/css/_variables.scss"
   }
 ]

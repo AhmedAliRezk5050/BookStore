@@ -6,7 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using BookStore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +17,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BookStoreWeb.Areas.Identity.Pages.Account
 {
@@ -21,11 +25,12 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
-
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        private readonly IOptions<GoogleReCaptchaSettings> _reCaptchaSettings;
+        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, IOptions<GoogleReCaptchaSettings> reCaptchaSettings)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _reCaptchaSettings = reCaptchaSettings;
         }
 
         /// <summary>
@@ -103,6 +108,25 @@ namespace BookStoreWeb.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            string encodedResponse = Request.Form["g-Recaptcha-Response"];
+            using var client = new HttpClient();
+            var endPoint = new Uri("https://www.google.com/recaptcha/api/siteverify");
+            var postJson = string.Format("secret=" + _reCaptchaSettings.Value.ReCaptchaSecretKey + "&response=" + encodedResponse);
+            var payload = new StringContent(postJson, Encoding.UTF8, "application/x-www-form-urlencoded");
+            var res = await client.PostAsync(endPoint, payload);
+            var jsonSerializeOptions = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+            var json = await res.Content.ReadFromJsonAsync<GoogleRecaptchaResponse>(jsonSerializeOptions);
+
+            if (!json.success)
+            {
+                ModelState.AddModelError("","Verify that you are not a robot");
+                return Page();
+            }
+            
+            
             returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
